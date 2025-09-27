@@ -1,3 +1,4 @@
+-- name: ListTopProfitableMovies :many
 -- Shows movies with highest revenue and profitability
 SELECT
     title,
@@ -18,6 +19,7 @@ WHERE
 ORDER BY profit DESC
 LIMIT 10;
 
+-- name: GenreAverageMetrics :many
 -- Analysis of genres by average metrics
 SELECT
     g.genre_name,
@@ -35,6 +37,7 @@ GROUP BY
     g.genre_name
 ORDER BY avg_rating DESC;
 
+-- name: MoviesByDecade :many
 -- Number of movies and average metrics by decades
 SELECT
     FLOOR(
@@ -64,6 +67,7 @@ GROUP BY
     ) * 10
 ORDER BY decade;
 
+-- name: ActorRoleCounts :many
 -- Actors with highest number of roles and average rating of their movies
 SELECT
     p.person_name,
@@ -83,6 +87,7 @@ HAVING
 ORDER BY roles_count DESC, avg_movie_rating DESC
 LIMIT 20;
 
+-- name: StudioPerformance :many
 -- Top studios by number of movies and average profit
 SELECT
     pc.company_name,
@@ -103,6 +108,7 @@ HAVING
 ORDER BY total_revenue DESC
 LIMIT 15;
 
+-- name: CountryProductionStats :many
 -- Geography of film production and average metrics
 SELECT
     c.country_name,
@@ -123,6 +129,7 @@ HAVING
     COUNT(m.movie_id) >= 10
 ORDER BY movies_count DESC;
 
+-- name: RuntimeSuccessSegments :many
 -- TOPIC 7: MOVIE DURATION AND COMMERCIAL SUCCESS
 SELECT
     CASE
@@ -148,6 +155,7 @@ GROUP BY
     END
 ORDER BY avg_revenue DESC;
 
+-- name: LanguagePopularity :many
 -- Analysis of original movie languages
 SELECT
     l.language_name,
@@ -167,6 +175,7 @@ HAVING
     COUNT(m.movie_id) >= 5
 ORDER BY movies_count DESC;
 
+-- name: KeywordTrends :many
 -- TOPIC 9: KEYWORDS AND TRENDS
 SELECT
     k.keyword_name,
@@ -186,6 +195,7 @@ HAVING
 ORDER BY movies_count DESC, avg_rating DESC
 LIMIT 20;
 
+-- name: DirectorPerformance :many
 -- Top directors by average metrics of their movies
 SELECT
     p.person_name as director_name,

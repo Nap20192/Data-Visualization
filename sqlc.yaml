@@ -1,0 +1,53 @@
+version: "2"
+
+overrides:
+  go:
+    overrides:
+      - db_type: "uuid"
+        go_type: "string"
+
+      - db_type: "timestamp"
+        go_type:
+          import: "time"
+          type: "Time"
+
+      - db_type: "timestamptz"
+        go_type:
+          import: "time"
+          type: "Time"
+
+      - db_type: "timestamp"
+        nullable: true
+        go_type:
+          import: "time"
+          type: "Time"
+          pointer: true
+
+      - db_type: "timestamptz"
+        nullable: true
+        go_type:
+          import: "time"
+          type: "Time"
+          pointer: true
+
+      - db_type: "boolean"
+        go_type: "bool"
+
+      - db_type: "float4"
+        go_type: "float32"
+
+      - db_type: "float8"
+        go_type: "float64"
+
+      - db_type: "double precision"
+        go_type: "float64"
+
+sql:
+  - engine: "postgresql"
+    queries: "queries/queries.sql"
+    schema: "qwe.sql"
+    gen:
+      go:
+        package: "connection"
+        out: "tutorial"
+        sql_package: "pgx/v5"
