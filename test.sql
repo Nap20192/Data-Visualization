@@ -1,36 +1,35 @@
-
 SELECT 'Фильмы без названия' as check_type, COUNT(*) as count
-FROM movies.movie
+FROM movie
 WHERE
     title IS NULL
     OR title = ''
 UNION ALL
 SELECT 'Фильмы без даты релиза', COUNT(*)
-FROM movies.movie
+FROM movie
 WHERE
     release_date IS NULL
 UNION ALL
 SELECT 'Фильмы без бюджета', COUNT(*)
-FROM movies.movie
+FROM movie
 WHERE
     budget IS NULL
     OR budget = 0
 UNION ALL
 SELECT 'Фильмы без доходов', COUNT(*)
-FROM movies.movie
+FROM movie
 WHERE
     revenue IS NULL
     OR revenue = 0;
 
 SELECT 'Роли без фильмов' as integrity_check, COUNT(*) as violations
-FROM movies.movie_cast mc
-    LEFT JOIN movies.movie m ON mc.movie_id = m.movie_id
+FROM movie_cast mc
+    LEFT JOIN movie m ON mc.movie_id = m.movie_id
 WHERE
     m.movie_id IS NULL
 UNION ALL
 SELECT 'Роли без актеров', COUNT(*)
-FROM movies.movie_cast mc
-    LEFT JOIN movies.person p ON mc.person_id = p.person_id
+FROM movie_cast mc
+    LEFT JOIN person p ON mc.person_id = p.person_id
 WHERE
     p.person_id IS NULL;
 
@@ -43,31 +42,30 @@ SELECT
             FROM release_date
         )
     ) as unique_years
-FROM movies.movie
+FROM movie
 WHERE
     release_date IS NOT NULL;
 
 SELECT 'Максимальный бюджет' as metric, MAX(budget) as value, title
-FROM movies.movie
+FROM movie
 WHERE
     budget = (
         SELECT MAX(budget)
-        FROM movies.movie
+        FROM movie
     )
 UNION ALL
 SELECT 'Максимальный доход', MAX(revenue), title
-FROM movies.movie
+FROM movie
 WHERE
     revenue = (
         SELECT MAX(revenue)
-        FROM movies.movie
+        FROM movie
     )
 UNION ALL
 SELECT 'Самый высокий рейтинг', MAX(vote_average), title
-FROM movies.movie
+FROM movie
 WHERE
     vote_average = (
         SELECT MAX(vote_average)
-        FROM movies.movie
+        FROM movie
     );
-

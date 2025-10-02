@@ -1,20 +1,20 @@
 
-DROP TABLE IF EXISTS movies.movie_cast;
+DROP TABLE IF EXISTS movie_cast;
 
-CREATE TABLE movies.movie_cast (
+CREATE TABLE movie_cast (
   movie_id INT DEFAULT NULL,
   person_id INT DEFAULT NULL,
   character_name varchar(400) DEFAULT NULL,
   gender_id INT DEFAULT NULL,
   cast_order INT DEFAULT NULL,
-  CONSTRAINT fk_mca_gender FOREIGN KEY (gender_id) REFERENCES movies.gender (gender_id),
-  CONSTRAINT fk_mca_movie FOREIGN KEY (movie_id) REFERENCES movies.movie (movie_id),
-  CONSTRAINT fk_mca_per FOREIGN KEY (person_id) REFERENCES movies.person (person_id)
+  CONSTRAINT fk_mca_gender FOREIGN KEY (gender_id) REFERENCES gender (gender_id),
+  CONSTRAINT fk_mca_movie FOREIGN KEY (movie_id) REFERENCES movie (movie_id),
+  CONSTRAINT fk_mca_per FOREIGN KEY (person_id) REFERENCES person (person_id)
 );
 
 
 
-INSERT INTO movies.movie_cast VALUES
+INSERT INTO movie_cast VALUES
 (285,85,'Captain Jack Sparrow',2,0),
 (285,114,'Will Turner',2,1),
 (285,116,'Elizabeth Swann',1,2),
@@ -29794,7 +29794,7 @@ INSERT INTO movies.movie_cast VALUES
 (1913,3810,'Ramu00f3n Sampedro',2,0);
 
 
-INSERT INTO movies.movie_cast VALUES (1913,19907,'Julia',1,1),
+INSERT INTO movie_cast VALUES (1913,19907,'Julia',1,1),
 (1913,2759,'Rosa',1,2),
 (1913,19908,'Joaquu00edn',1,3),
 (1913,19909,'Padre Francisco',2,4),
@@ -59215,7 +59215,7 @@ INSERT INTO movies.movie_cast VALUES (1913,19907,'Julia',1,1),
 (10133,1205722,'Hotel Janitor Boise',2,20);
 
 
-INSERT INTO movies.movie_cast VALUES (10133,1165052,'Convention Waiter Boise',2,21),
+INSERT INTO movie_cast VALUES (10133,1165052,'Convention Waiter Boise',2,21),
 (10133,12489,'Speaker #1 Boise',0,22),
 (10133,214063,'Speaker #3 Boise',0,23),
 (10133,185177,'Man In White Coat Boise',2,24),
@@ -87267,7 +87267,7 @@ INSERT INTO movies.movie_cast VALUES (10133,1165052,'Convention Waiter Boise',2,
 (318846,19011,'Himself (archive footage)',2,92);
 
 
-INSERT INTO movies.movie_cast VALUES
+INSERT INTO movie_cast VALUES
 (318846,1746014,'Casino Patron / Pool Party goer',0,93),
 (318846,1697155,'Club Dancer',0,94),
 (318846,1737691,'Bank of America Executive',1,95),

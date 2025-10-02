@@ -1,6 +1,6 @@
-DROP TABLE IF EXISTS movies.person;
+DROP TABLE IF EXISTS person;
 
-CREATE TABLE movies.person (
+CREATE TABLE person (
   person_id INT NOT NULL,
   person_name varchar(500) DEFAULT NULL,
   CONSTRAINT pk_person PRIMARY KEY (person_id)
@@ -8,7 +8,7 @@ CREATE TABLE movies.person (
 
 
 
-INSERT INTO movies.person VALUES
+INSERT INTO person VALUES
 (1,'George Lucas'),
 (2,'Mark Hamill'),
 (3,'Harrison Ford'),
@@ -41083,7 +41083,7 @@ INSERT INTO movies.person VALUES
 
 
 
-INSERT INTO movies.person VALUES
+INSERT INTO person VALUES
 (185147,'Sam Moses'),
 (185154,'Vincent Marino'),
 (185165,'Pedro Salvu00edn'),
@@ -79167,7 +79167,7 @@ INSERT INTO movies.person VALUES
 (1484714,'Suzanne Benoit');
 
 
-INSERT INTO movies.person VALUES (1484779,'Deana Deatherage'),
+INSERT INTO person VALUES (1484779,'Deana Deatherage'),
 (1484863,'Yves Michel-Beneche'),
 (1484864,'Elizabeth Greenberg'),
 (1484865,'Liam Noble'),

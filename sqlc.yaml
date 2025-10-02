@@ -1,56 +1,94 @@
 version: "2"
 
-overrides:
-  go:
-    overrides:
-      - db_type: "text"
-        go_type: "string"
-
-      - db_type: "uuid"
-        go_type: "string"
-
-      - db_type: "timestamp"
-        go_type:
-          import: "time"
-          type: "Time"
-
-      - db_type: "timestamptz"
-        go_type:
-          import: "time"
-          type: "Time"
-
-      - db_type: "timestamp"
-        nullable: true
-        go_type:
-          import: "time"
-          type: "Time"
-          pointer: true
-
-      - db_type: "timestamptz"
-        nullable: true
-        go_type:
-          import: "time"
-          type: "Time"
-          pointer: true
-
-      - db_type: "boolean"
-        go_type: "bool"
-
-      - db_type: "float4"
-        go_type: "float32"
-
-      - db_type: "float8"
-        go_type: "float64"
-
-      - db_type: "double precision"
-        go_type: "float64"
-
 sql:
   - engine: "postgresql"
     queries: "queries/queries.sql"
-    schema: "qwe.sql"
+    schema: "migrations/"
     gen:
       go:
-        package: "connection"
-        out: "tutorial"
+        package: "db"
+        out: "db"
         sql_package: "pgx/v5"
+        emit_json_tags: true
+        emit_prepared_queries: false
+        emit_interface: false
+        emit_exact_table_names: false
+        emit_empty_slices: false
+
+overrides:
+  go:
+    overrides:
+      # строковые
+      - db_type: "text"
+        go_type: "string"
+      - db_type: "varchar"
+        go_type: "string"
+      - db_type: "varchar(10)"
+        go_type: "string"
+      - db_type: "varchar(50)"
+        go_type: "string"
+      - db_type: "varchar(100)"
+        go_type: "string"
+      - db_type: "varchar(200)"
+        go_type: "string"
+      - db_type: "varchar(400)"
+        go_type: "string"
+      - db_type: "varchar(500)"
+        go_type: "string"
+      - db_type: "varchar(1000)"
+        go_type: "string"
+      - db_type: "uuid"
+        go_type: "string"
+
+      # числа
+      - db_type: "int"
+        go_type: "int"
+
+      - db_type: "int4"
+        go_type: "int64"
+      - db_type: "integer"
+        go_type: "int64"
+      - db_type: "int8"
+        go_type: "int64"
+      - db_type: "bigint"
+        go_type: "int64"
+      - db_type: "decimal"
+        go_type: "float64"
+      - db_type: "decimal(12, 6)"
+        go_type: "float64"
+      - db_type: "decimal(12,6)"
+        go_type: "float64"
+      - db_type: "decimal(4, 2)"
+        go_type: "float64"
+      - db_type: "decimal(4,2)"
+        go_type: "float64"
+      - db_type: "numeric"
+        go_type: "float64"
+      - db_type: "float4"
+        go_type: "float32"
+      - db_type: "float8"
+        go_type: "float64"
+
+      # булевые
+      - db_type: "bool"
+        go_type: "bool"
+
+      # даты
+      - db_type: "date"
+        go_type: "time.Time"
+      - db_type: "timestamp"
+        go_type: "time.Time"
+      - db_type: "timestamptz"
+        go_type: "time.Time"
+
+      # доп. для функций/агрегатов
+      - db_type: "pg_catalog.text"
+        go_type: "string"
+      - db_type: "pg_catalog.varchar"
+        go_type: "string"
+      - db_type: "pg_catalog.numeric"
+        go_type: "float64"
+      - db_type: "pg_catalog.int4"
+        go_type: "int32"
+      - db_type: "pg_catalog.int8"
+        go_type: "int64"

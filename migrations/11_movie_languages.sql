@@ -1,17 +1,17 @@
-DROP TABLE IF EXISTS movies.movie_languages;
+DROP TABLE IF EXISTS movie_languages;
 
-CREATE TABLE movies.movie_languages (
+CREATE TABLE movie_languages (
   movie_id INT DEFAULT NULL,
   language_id INT DEFAULT NULL,
   language_role_id INT DEFAULT NULL,
-  CONSTRAINT fk_ml_lang FOREIGN KEY (language_id) REFERENCES movies.language (language_id),
-  CONSTRAINT fk_ml_movie FOREIGN KEY (movie_id) REFERENCES movies.movie (movie_id),
-  CONSTRAINT fk_ml_role FOREIGN KEY (language_role_id) REFERENCES movies.language_role (role_id)
+  CONSTRAINT fk_ml_lang FOREIGN KEY (language_id) REFERENCES language (language_id),
+  CONSTRAINT fk_ml_movie FOREIGN KEY (movie_id) REFERENCES movie (movie_id),
+  CONSTRAINT fk_ml_role FOREIGN KEY (language_role_id) REFERENCES language_role (role_id)
 );
 
 
 
-INSERT INTO movies.movie_languages VALUES
+INSERT INTO movie_languages VALUES
 (5,24574,2),
 (11,24574,2),
 (12,24574,2),

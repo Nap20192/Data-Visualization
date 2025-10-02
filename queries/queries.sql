@@ -12,12 +12,12 @@ SELECT
         2
     ) as roi_percent,
     vote_average
-FROM movies.movie
+FROM movie
 WHERE
     budget > 0
     AND revenue > 0
 ORDER BY profit DESC
-LIMIT 10;
+LIMIT 300;
 
 -- name: GenreAverageMetrics :many
 -- Analysis of genres by average metrics
@@ -27,9 +27,9 @@ SELECT
     ROUND(AVG(m.vote_average), 2) as avg_rating,
     ROUND(AVG(m.popularity), 2) as avg_popularity,
     ROUND(AVG(m.revenue), 0) as avg_revenue
-FROM movies.genre g
-    JOIN movies.movie_genres mg ON g.genre_id = mg.genre_id
-    JOIN movies.movie m ON mg.movie_id = m.movie_id
+FROM genre g
+    JOIN movie_genres mg ON g.genre_id = mg.genre_id
+    JOIN movie m ON mg.movie_id = m.movie_id
 WHERE
     m.vote_average > 0
 GROUP BY
@@ -37,7 +37,7 @@ GROUP BY
     g.genre_name
 ORDER BY avg_rating DESC;
 
--- name: MoviesByDecade :many
+-- name: DecadeTrends :many
 -- Number of movies and average metrics by decades
 SELECT
     FLOOR(
@@ -51,7 +51,8 @@ SELECT
     ROUND(AVG(revenue), 0) as avg_revenue,
     ROUND(AVG(vote_average), 2) as avg_rating,
     ROUND(AVG(runtime), 0) as avg_runtime
-FROM movies.movie
+FROM movie
+
 WHERE
     release_date IS NOT NULL
     AND EXTRACT(
@@ -74,9 +75,9 @@ SELECT
     COUNT(mc.movie_id) as roles_count,
     ROUND(AVG(m.vote_average), 2) as avg_movie_rating,
     ROUND(AVG(m.popularity), 2) as avg_movie_popularity
-FROM movies.person p
-    JOIN movies.movie_cast mc ON p.person_id = mc.person_id
-    JOIN movies.movie m ON mc.movie_id = m.movie_id
+FROM person p
+    JOIN movie_cast mc ON p.person_id = mc.person_id
+    JOIN movie m ON mc.movie_id = m.movie_id
 WHERE
     m.vote_average > 0
 GROUP BY
@@ -95,9 +96,9 @@ SELECT
     ROUND(AVG(m.revenue), 0) as avg_revenue,
     ROUND(AVG(m.vote_average), 2) as avg_rating,
     SUM(m.revenue) as total_revenue
-FROM movies.production_company pc
-    JOIN movies.movie_company mcom ON pc.company_id = mcom.company_id
-    JOIN movies.movie m ON mcom.movie_id = m.movie_id
+FROM production_company pc
+    JOIN movie_company mcom ON pc.company_id = mcom.company_id
+    JOIN movie m ON mcom.movie_id = m.movie_id
 WHERE
     m.revenue > 0
 GROUP BY
@@ -116,9 +117,9 @@ SELECT
     ROUND(AVG(m.budget), 0) as avg_budget,
     ROUND(AVG(m.revenue), 0) as avg_revenue,
     ROUND(AVG(m.vote_average), 2) as avg_rating
-FROM movies.country c
-    JOIN movies.production_country pc ON c.country_id = pc.country_id
-    JOIN movies.movie m ON pc.movie_id = m.movie_id
+FROM country c
+    JOIN production_country pc ON c.country_id = pc.country_id
+    JOIN movie m ON pc.movie_id = m.movie_id
 WHERE
     m.budget > 0
     AND m.revenue > 0
@@ -142,7 +143,7 @@ SELECT
     ROUND(AVG(revenue), 0) as avg_revenue,
     ROUND(AVG(vote_average), 2) as avg_rating,
     ROUND(AVG(popularity), 2) as avg_popularity
-FROM movies.movie
+FROM movie
 WHERE
     runtime IS NOT NULL
     AND runtime > 0
@@ -163,9 +164,9 @@ SELECT
     ROUND(AVG(m.vote_average), 2) as avg_rating,
     ROUND(AVG(m.revenue), 0) as avg_revenue,
     ROUND(AVG(m.popularity), 2) as avg_popularity
-FROM movies.language l
-    JOIN movies.movie_languages ml ON l.language_id = ml.language_id
-    JOIN movies.movie m ON ml.movie_id = m.movie_id
+FROM language l
+    JOIN movie_languages ml ON l.language_id = ml.language_id
+    JOIN movie m ON ml.movie_id = m.movie_id
 WHERE
     m.vote_average > 0
 GROUP BY
@@ -182,9 +183,9 @@ SELECT
     COUNT(m.movie_id) as movies_count,
     ROUND(AVG(m.vote_average), 2) as avg_rating,
     ROUND(AVG(m.revenue), 0) as avg_revenue
-FROM movies.keyword k
-    JOIN movies.movie_keywords mk ON k.keyword_id = mk.keyword_id
-    JOIN movies.movie m ON mk.movie_id = m.movie_id
+FROM keyword k
+    JOIN movie_keywords mk ON k.keyword_id = mk.keyword_id
+    JOIN movie m ON mk.movie_id = m.movie_id
 WHERE
     m.vote_average > 0
 GROUP BY
@@ -204,10 +205,10 @@ SELECT
     ROUND(AVG(m.revenue), 0) as avg_revenue,
     ROUND(AVG(m.budget), 0) as avg_budget,
     SUM(m.revenue) as total_box_office
-FROM movies.person p
-    JOIN movies.movie_crew mc ON p.person_id = mc.person_id
-    JOIN movies.movie m ON mc.movie_id = m.movie_id
-    JOIN movies.department d ON mc.department_id = d.department_id
+FROM person p
+    JOIN movie_crew mc ON p.person_id = mc.person_id
+    JOIN movie m ON mc.movie_id = m.movie_id
+    JOIN department d ON mc.department_id = d.department_id
 WHERE
     d.department_name = 'Directing'
     AND mc.job = 'Director'

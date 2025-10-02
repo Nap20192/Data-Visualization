@@ -1,14 +1,14 @@
-DROP TABLE IF EXISTS movies.movie_keywords;
+DROP TABLE IF EXISTS movie_keywords;
 
-CREATE TABLE movies.movie_keywords (
+CREATE TABLE movie_keywords (
   movie_id INT DEFAULT NULL,
   keyword_id INT DEFAULT NULL,
-  CONSTRAINT fk_mk_keyword FOREIGN KEY (keyword_id) REFERENCES movies.keyword (keyword_id),
-  CONSTRAINT fk_mk_movie FOREIGN KEY (movie_id) REFERENCES movies.movie (movie_id)
+  CONSTRAINT fk_mk_keyword FOREIGN KEY (keyword_id) REFERENCES keyword (keyword_id),
+  CONSTRAINT fk_mk_movie FOREIGN KEY (movie_id) REFERENCES movie (movie_id)
 );
 
 
-INSERT INTO movies.movie_keywords VALUES
+INSERT INTO movie_keywords VALUES
 (5,612),
 (5,613),
 (5,616),

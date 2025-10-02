@@ -1,12 +1,12 @@
-DROP TABLE IF EXISTS movies.production_company;
+DROP TABLE IF EXISTS production_company;
 
-CREATE TABLE movies.production_company (
+CREATE TABLE production_company (
   company_id INT NOT NULL,
   company_name varchar(200) DEFAULT NULL,
   CONSTRAINT pk_prodcomp PRIMARY KEY (company_id)
 );
 
-INSERT INTO movies.production_company VALUES
+INSERT INTO production_company VALUES
 (1,'Lucasfilm'),
 (2,'Walt Disney Pictures'),
 (3,'Pixar Animation Studios'),
