@@ -1,0 +1,5 @@
+duration_category,movies_count,avg_revenue,avg_rating,avg_popularity
+Very long (>150 min),171,221625726,7.05,42.86
+Long (121-150 min),817,153455744,6.66,32.80
+Medium (90-120 min),3108,65779393,6.04,19.51
+Short (<90 min),670,40868000,5.53,12.61

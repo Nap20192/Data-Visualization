@@ -3,6 +3,9 @@ version: "2"
 overrides:
   go:
     overrides:
+      - db_type: "text"
+        go_type: "string"
+
       - db_type: "uuid"
         go_type: "string"
 

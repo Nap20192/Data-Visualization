@@ -363,9 +363,9 @@ LIMIT 10
 
 type ListTopProfitableMoviesRow struct {
 	Title       string
-	Budget      int32
+	Budget      int
 	Revenue     int64
-	Profit      int32
+	Profit      int
 	RoiPercent  float64
 	VoteAverage float64
 }
@@ -429,7 +429,7 @@ ORDER BY decade
 `
 
 type MoviesByDecadeRow struct {
-	Decade      int32
+	Decade      int
 	MoviesCount int
 	AvgBudget   float64
 	AvgRevenue  float64
