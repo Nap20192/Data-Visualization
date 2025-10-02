@@ -17,7 +17,7 @@ WHERE
     budget > 0
     AND revenue > 0
 ORDER BY profit DESC
-LIMIT 300;
+LIMIT 400;
 
 -- name: GenreAverageMetrics :many
 -- Analysis of genres by average metrics
@@ -67,6 +67,24 @@ GROUP BY
         ) / 10
     ) * 10
 ORDER BY decade;
+
+-- name: YearlyTrends :many
+-- Number of movies and average metrics by year
+SELECT
+    EXTRACT(YEAR FROM release_date)::int AS year,
+    COUNT(*) AS movies_count,
+    ROUND(AVG(budget), 0) AS avg_budget,
+    ROUND(AVG(revenue), 0) AS avg_revenue,
+    ROUND(AVG(vote_average), 2) AS avg_rating,
+    ROUND(AVG(runtime), 0) AS avg_runtime
+FROM movie
+WHERE
+    release_date IS NOT NULL
+    AND EXTRACT(YEAR FROM release_date) < 2017
+GROUP BY
+    EXTRACT(YEAR FROM release_date)
+ORDER BY year;
+
 
 -- name: ActorRoleCounts :many
 -- Actors with highest number of roles and average rating of their movies

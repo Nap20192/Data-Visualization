@@ -430,7 +430,7 @@ WHERE
     budget > 0
     AND revenue > 0
 ORDER BY profit DESC
-LIMIT 300
+LIMIT 400
 `
 
 type ListTopProfitableMoviesRow struct {
@@ -576,6 +576,60 @@ func (q *Queries) StudioPerformance(ctx context.Context) ([]StudioPerformanceRow
 			&i.AvgRevenue,
 			&i.AvgRating,
 			&i.TotalRevenue,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const yearlyTrends = `-- name: YearlyTrends :many
+SELECT
+    EXTRACT(YEAR FROM release_date)::int AS year,
+    COUNT(*) AS movies_count,
+    ROUND(AVG(budget), 0) AS avg_budget,
+    ROUND(AVG(revenue), 0) AS avg_revenue,
+    ROUND(AVG(vote_average), 2) AS avg_rating,
+    ROUND(AVG(runtime), 0) AS avg_runtime
+FROM movie
+WHERE
+    release_date IS NOT NULL
+    AND EXTRACT(YEAR FROM release_date) < 2017
+GROUP BY
+    EXTRACT(YEAR FROM release_date)
+ORDER BY year
+`
+
+type YearlyTrendsRow struct {
+	Year        int32   `json:"year"`
+	MoviesCount int64   `json:"movies_count"`
+	AvgBudget   float64 `json:"avg_budget"`
+	AvgRevenue  float64 `json:"avg_revenue"`
+	AvgRating   float64 `json:"avg_rating"`
+	AvgRuntime  float64 `json:"avg_runtime"`
+}
+
+// Number of movies and average metrics by year
+func (q *Queries) YearlyTrends(ctx context.Context) ([]YearlyTrendsRow, error) {
+	rows, err := q.db.Query(ctx, yearlyTrends)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []YearlyTrendsRow
+	for rows.Next() {
+		var i YearlyTrendsRow
+		if err := rows.Scan(
+			&i.Year,
+			&i.MoviesCount,
+			&i.AvgBudget,
+			&i.AvgRevenue,
+			&i.AvgRating,
+			&i.AvgRuntime,
 		); err != nil {
 			return nil, err
 		}

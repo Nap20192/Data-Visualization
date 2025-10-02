@@ -40,38 +40,48 @@ func (c *Charts) GenerateAllCharts() error {
 	return nil
 }
 
-// PIE: фильмы по странам
-func (c *Charts) PieChart() error {
+func (c *Charts) Histogram() error {
 	data, err := c.repo.CountryProductionStats(context.TODO())
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to get country production stats: %w", err)
 	}
 
-	items := make([]opts.PieData, 0, len(data))
-	for _, item := range data {
-		items = append(items, opts.PieData{
-			Name:  item.CountryName.String,
-			Value: item.MoviesCount,
-		})
+	// собираем ось X (страны) и значения (кол-во фильмов)
+	countries := make([]string, 0, len(data))
+	values := make([]opts.BarData, 0, len(data))
+
+	for _, d := range data {
+		countries = append(countries, d.CountryName.String)
+		values = append(values, opts.BarData{Value: d.MoviesCount})
 	}
 
-	pie := charts.NewPie()
-	pie.SetGlobalOptions(
+	// создаём bar chart
+	bar := charts.NewBar()
+	bar.SetGlobalOptions(
 		charts.WithTitleOpts(opts.Title{Title: "Film Production by Country"}),
 		charts.WithTooltipOpts(opts.Tooltip{Show: opts.Bool(true)}),
+		charts.WithXAxisOpts(opts.XAxis{
+			Name: "Country",
+			Type: "category",
+		}),
+		charts.WithYAxisOpts(opts.YAxis{
+			Name: "Movies",
+		}),
 	)
-	pie.AddSeries("Countries", items).
+
+	bar.SetXAxis(countries).
+		AddSeries("Movies", values).
 		SetSeriesOptions(
 			charts.WithLabelOpts(opts.Label{
 				Show:      opts.Bool(true),
-				Formatter: "{b}: {d}%",
+				Position:  "top",
+				Formatter: "{c}",
 			}),
 		)
 
-	return c.render(pie, "pie.html")
+	return c.render(bar, "histogram.html")
 }
 
-// BAR: средний рейтинг по жанрам
 func (c *Charts) BarChart() error {
 	data, err := c.repo.GenreAverageMetrics(context.TODO())
 	if err != nil {
@@ -97,25 +107,26 @@ func (c *Charts) BarChart() error {
 	return c.render(bar, "bar.html")
 }
 
-// LINE: динамика выручки по десятилетиям
 func (c *Charts) LineChart() error {
-	data, err := c.repo.DecadeTrends(context.TODO())
+	data, err := c.repo.YearlyTrends(context.TODO())
 	if err != nil {
 		return err
 	}
-	decades := make([]string, 0, len(data))
+
+	years := make([]string, 0, len(data))
 	avgRevenue := make([]opts.LineData, 0, len(data))
+
 	for _, item := range data {
-		decades = append(decades, fmt.Sprintf("%d", item.Decade))
+		years = append(years, fmt.Sprintf("%d", item.Year))
 		avgRevenue = append(avgRevenue, opts.LineData{Value: item.AvgRevenue})
 	}
 
 	line := charts.NewLine()
 	line.SetGlobalOptions(
-		charts.WithTitleOpts(opts.Title{Title: "Average Revenue by Decade"}),
+		charts.WithTitleOpts(opts.Title{Title: "Average Revenue by Year"}),
 		charts.WithTooltipOpts(opts.Tooltip{Show: opts.Bool(true)}),
 	)
-	line.SetXAxis(decades).
+	line.SetXAxis(years).
 		AddSeries("Avg Revenue", avgRevenue).
 		SetSeriesOptions(charts.WithLineChartOpts(opts.LineChart{Smooth: opts.Bool(true)}))
 
@@ -158,12 +169,11 @@ func (c *Charts) ScatterPlot() error {
 			Name: "Revenue ($)",
 		}),
 		charts.WithTooltipOpts(opts.Tooltip{
-			Show: opts.Bool(true),
+			Show:      opts.Bool(true),
 			Formatter: "{b}",
 		}),
 	)
 
-	// убираем метки прямо на точках, чтобы не засорять график
 	scatter.AddSeries("Movies", points).
 		SetSeriesOptions(
 			charts.WithLabelOpts(opts.Label{Show: opts.Bool(false)}),
@@ -172,31 +182,37 @@ func (c *Charts) ScatterPlot() error {
 	return c.render(scatter, "scatter.html")
 }
 
-func (c *Charts) Histogram() error {
-
+func (c *Charts) PieChart() error {
 	data, err := c.repo.RuntimeSuccessSegments(context.TODO())
-
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to get runtime success segments: %w", err)
 	}
 
-	categories := make([]string, 0, len(data))
-	values := make([]opts.BarData, 0, len(data))
-
-	for _, r := range data {
-		categories = append(categories, r.DurationCategory)
-		values = append(values, opts.BarData{Value: r.MoviesCount})
+	items := make([]opts.PieData, 0, len(data))
+	for _, d := range data {
+		items = append(items, opts.PieData{
+			Name:  d.DurationCategory,
+			Value: d.MoviesCount,
+		})
 	}
 
-	hist := charts.NewBar()
-
-	hist.SetGlobalOptions(
-		charts.WithTitleOpts(opts.Title{Title: "Movies by Runtime Segments"}),
+	pie := charts.NewPie()
+	pie.SetGlobalOptions(
+		charts.WithTitleOpts(opts.Title{
+			Title: "Movie Duration Distribution",
+		}),
 		charts.WithTooltipOpts(opts.Tooltip{Show: opts.Bool(true)}),
 	)
-	hist.SetXAxis(categories).AddSeries("Count", values)
 
-	return c.render(hist, "histogram.html")
+	pie.AddSeries("Durations", items).
+		SetSeriesOptions(
+			charts.WithLabelOpts(opts.Label{
+				Show:      opts.Bool(true),
+				Formatter: "{b}: {c} ({d}%)",
+			}),
+		)
+
+	return c.render(pie, "pie.html")
 }
 
 type ChartRenderer interface {
