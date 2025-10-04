@@ -6,6 +6,16 @@ USER root
 COPY init-superset.sh /init-superset.sh
 RUN chmod +x /init-superset.sh
 
+# Copy Superset configuration
+COPY superset_config.py /app/pythonpath/superset_config.py
+
+# Create directories with proper permissions
+RUN mkdir -p /app/superset_home /tmp/superset_uploads && \
+    chown -R superset:superset /app/superset_home /tmp/superset_uploads
+
+# Install Postgres driver in the superset virtual environment
+RUN /app/.venv/bin/pip install --no-cache-dir psycopg2-binary
+
 # Switch back to superset user
 USER superset
 
