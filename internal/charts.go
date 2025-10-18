@@ -6,14 +6,17 @@ import (
 	"io"
 	"math"
 	"os"
+	"path/filepath"
 	"slices"
 	"sort"
+	"strconv"
 	"time"
 
 	"dv/db"
 
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
+	"github.com/xuri/excelize/v2"
 )
 
 type Charts struct {
@@ -29,6 +32,8 @@ func NewCharts(repo *db.Queries, dir string) *Charts {
 }
 
 func (c *Charts) GenerateAllCharts() error {
+	excelExporter := NewExcelExporter("exports")
+
 	type job struct {
 		name      string
 		desc      string
@@ -49,6 +54,10 @@ func (c *Charts) GenerateAllCharts() error {
 		rows, err := j.run()
 		if err != nil {
 			return fmt.Errorf("chart %s failed: %w", j.name, err)
+		}
+		// export data for this chart
+		if err := c.exportRawData(j.name, excelExporter); err != nil {
+			return fmt.Errorf("excel export for %s failed: %w", j.name, err)
 		}
 		fmt.Printf("[OK] %-10s %-12s rows=%d -> %s\n", j.chartType, j.name, rows, j.desc)
 	}
@@ -457,4 +466,158 @@ func (c *Charts) render(chart ChartRenderer, filename string) error {
 	defer f.Close()
 
 	return chart.Render(f)
+}
+
+// --- Excel exporter (new) ---
+type ExcelExporter struct {
+	dir string
+}
+
+func NewExcelExporter(dir string) *ExcelExporter { return &ExcelExporter{dir: dir} }
+
+func (e *ExcelExporter) Export(filename string, headers []string, rows [][]string) error {
+	f := excelize.NewFile()
+	sheet := "Sheet1"
+	f.SetSheetName("Sheet1", sheet)
+	// Запись заголовков
+	for i, h := range headers {
+		cell, _ := excelize.CoordinatesToCellName(i+1, 1)
+		_ = f.SetCellValue(sheet, cell, h)
+	}
+	// Запись данных
+	for r, row := range rows {
+		for c, v := range row {
+			cell, _ := excelize.CoordinatesToCellName(c+1, r+2)
+			_ = f.SetCellValue(sheet, cell, v)
+		}
+	}
+	// 1. Закреплённые строки/столбцы для заголовков
+	_ = f.SetPanes(sheet, &excelize.Panes{Freeze: true, Split: true, XSplit: 1, YSplit: 1})
+
+	// 2. Фильтры на все колонки
+	endColName, _ := excelize.ColumnNumberToName(len(headers))
+	filterRange := fmt.Sprintf("A1:%s%d", endColName, len(rows)+1)
+	_ = f.AutoFilter(sheet, filterRange, nil)
+
+	// 3. Градиентная заливка + 4. Условное форматирование для числовых колонок
+	for c := 0; c < len(headers); c++ {
+		isNum := true
+		for r := 0; r < len(rows); r++ {
+			if _, err := strconv.ParseFloat(rows[r][c], 64); err != nil {
+				isNum = false
+				break
+			}
+		}
+		if !isNum {
+			continue
+		}
+		col, _ := excelize.ColumnNumberToName(c + 1)
+		rng := fmt.Sprintf("%s2:%s%d", col, col, len(rows)+1)
+		minStyleID, _ := f.NewStyle(&excelize.Style{Font: &excelize.Font{Color: "#388e3c", Bold: true}})
+		maxStyleID, _ := f.NewStyle(&excelize.Style{Font: &excelize.Font{Color: "#d32f2f", Bold: true}})
+		minPtr, maxPtr := &minStyleID, &maxStyleID
+		_ = f.SetConditionalFormat(sheet, rng, []excelize.ConditionalFormatOptions{
+			{Type: "colorScale"},
+			{Type: "bottom", Criteria: "=", Value: "1", Format: minPtr},
+			{Type: "top", Criteria: "=", Value: "1", Format: maxPtr},
+		})
+	}
+	if err := f.SaveAs(filepath.Join(e.dir, filename)); err != nil {
+		return err
+	}
+	fmt.Printf("Excel exported: %s (%d rows)\n", filename, len(rows))
+	return nil
+}
+
+// exportRawData fetches data again (light overhead) and writes Excel per chart name.
+func (c *Charts) exportRawData(name string, x *ExcelExporter) error {
+	ctx := context.TODO()
+	switch name {
+	case "pie":
+		data, err := c.repo.RuntimeSuccessSegments(ctx)
+		if err != nil {
+			return err
+		}
+		headers := []string{"DurationCategory", "MoviesCount"}
+		rows := make([][]string, 0, len(data))
+		for _, d := range data {
+			rows = append(rows, []string{d.DurationCategory, fmt.Sprintf("%d", d.MoviesCount)})
+		}
+		return x.Export("pie.xlsx", headers, rows)
+	case "bar":
+		data, err := c.repo.GenreAverageMetrics(ctx)
+		if err != nil {
+			return err
+		}
+		headers := []string{"Genre", "AvgRating"}
+		rows := make([][]string, 0, len(data))
+		for _, g := range data {
+			rows = append(rows, []string{g.GenreName.String, fmt.Sprintf("%.3f", g.AvgRating)})
+		}
+		return x.Export("bar.xlsx", headers, rows)
+	case "hbar":
+		data, err := c.repo.StudioPerformance(ctx)
+		if err != nil {
+			return err
+		}
+		headers := []string{"Studio", "TotalRevenue"}
+		rows := make([][]string, 0, len(data))
+		for _, s := range data {
+			rows = append(rows, []string{s.CompanyName.String, fmt.Sprintf("%d", s.TotalRevenue)})
+		}
+		return x.Export("hbar.xlsx", headers, rows)
+	case "line":
+		data, err := c.repo.YearlyTrends(ctx)
+		if err != nil {
+			return err
+		}
+		headers := []string{"Year", "AvgRevenue", "MoviesCount"}
+		rows := make([][]string, 0, len(data))
+		for _, y := range data {
+			rows = append(rows, []string{fmt.Sprintf("%d", y.Year), fmt.Sprintf("%v", y.AvgRevenue), fmt.Sprintf("%d", y.MoviesCount)})
+		}
+		return x.Export("line.xlsx", headers, rows)
+	case "hist":
+		data, err := c.repo.ListTopProfitableMovies(ctx)
+		if err != nil {
+			return err
+		}
+		headers := []string{"Title", "ROIPercent", "Budget", "Revenue"}
+		rows := make([][]string, 0, len(data))
+		for _, m := range data {
+			revenue := ""
+			if m.Revenue.Valid {
+				revenue = fmt.Sprintf("%d", m.Revenue.Int64)
+			}
+			rows = append(rows, []string{
+				m.Title.String,
+				fmt.Sprintf("%.4f", m.RoiPercent),
+				fmt.Sprintf("%d", m.Budget.Int32),
+				revenue,
+			})
+		}
+		return x.Export("hist.xlsx", headers, rows)
+	case "scatter":
+		data, err := c.repo.ListTopProfitableMovies(ctx)
+		if err != nil {
+			return err
+		}
+		headers := []string{"Title", "Budget", "Revenue", "ROIPercent"}
+		rows := make([][]string, 0, len(data))
+		for _, m := range data {
+			revenue := ""
+			if m.Revenue.Valid {
+				revenue = fmt.Sprintf("%d", m.Revenue.Int64)
+			}
+			rows = append(rows, []string{
+				m.Title.String,
+				fmt.Sprintf("%d", m.Budget.Int32),
+				revenue,
+				fmt.Sprintf("%.4f", m.RoiPercent),
+			})
+		}
+		return x.Export("scatter.xlsx", headers, rows)
+	default:
+		return nil
+	}
 }

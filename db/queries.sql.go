@@ -17,7 +17,8 @@ SELECT
     COUNT(mc.movie_id) as roles_count,
     ROUND(AVG(m.vote_average), 2) as avg_movie_rating,
     ROUND(AVG(m.popularity), 2) as avg_movie_popularity
-FROM person p
+FROM
+    person p
     JOIN movie_cast mc ON p.person_id = mc.person_id
     JOIN movie m ON mc.movie_id = m.movie_id
 WHERE
@@ -71,7 +72,8 @@ SELECT
     ROUND(AVG(m.budget), 0) as avg_budget,
     ROUND(AVG(m.revenue), 0) as avg_revenue,
     ROUND(AVG(m.vote_average), 2) as avg_rating
-FROM country c
+FROM
+    country c
     JOIN production_country pc ON c.country_id = pc.country_id
     JOIN movie m ON pc.movie_id = m.movie_id
 WHERE
@@ -134,7 +136,6 @@ SELECT
     ROUND(AVG(vote_average), 2) as avg_rating,
     ROUND(AVG(runtime), 0) as avg_runtime
 FROM movie
-
 WHERE
     release_date IS NOT NULL
     AND EXTRACT(
@@ -196,7 +197,8 @@ SELECT
     ROUND(AVG(m.revenue), 0) as avg_revenue,
     ROUND(AVG(m.budget), 0) as avg_budget,
     SUM(m.revenue) as total_box_office
-FROM person p
+FROM
+    person p
     JOIN movie_crew mc ON p.person_id = mc.person_id
     JOIN movie m ON mc.movie_id = m.movie_id
     JOIN department d ON mc.department_id = d.department_id
@@ -258,7 +260,8 @@ SELECT
     ROUND(AVG(m.vote_average), 2) as avg_rating,
     ROUND(AVG(m.popularity), 2) as avg_popularity,
     ROUND(AVG(m.revenue), 0) as avg_revenue
-FROM genre g
+FROM
+    genre g
     JOIN movie_genres mg ON g.genre_id = mg.genre_id
     JOIN movie m ON mg.movie_id = m.movie_id
 WHERE
@@ -304,13 +307,307 @@ func (q *Queries) GenreAverageMetrics(ctx context.Context) ([]GenreAverageMetric
 	return items, nil
 }
 
+const getAllMovieRatingTable = `-- name: GetAllMovieRatingTable :many
+SELECT
+    movie_id,
+    rating_id
+FROM movie_rating
+ORDER BY movie_id, rating_id
+`
+
+// Get all rows from movie_rating junction table
+func (q *Queries) GetAllMovieRatingTable(ctx context.Context) ([]MovieRating, error) {
+	rows, err := q.db.Query(ctx, getAllMovieRatingTable)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []MovieRating
+	for rows.Next() {
+		var i MovieRating
+		if err := rows.Scan(&i.MovieID, &i.RatingID); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAllMovieRatings = `-- name: GetAllMovieRatings :many
+SELECT
+    mr.movie_id,
+    m.title,
+    mr.rating_id,
+    r.rating_value,
+    r.created_at
+FROM movie_rating mr
+    JOIN movie m ON mr.movie_id = m.movie_id
+    JOIN rating r ON mr.rating_id = r.id
+ORDER BY r.created_at DESC
+`
+
+type GetAllMovieRatingsRow struct {
+	MovieID     int32            `json:"movie_id"`
+	Title       pgtype.Text      `json:"title"`
+	RatingID    int32            `json:"rating_id"`
+	RatingValue float64          `json:"rating_value"`
+	CreatedAt   pgtype.Timestamp `json:"created_at"`
+}
+
+// Get all movie ratings with movie and rating details
+func (q *Queries) GetAllMovieRatings(ctx context.Context) ([]GetAllMovieRatingsRow, error) {
+	rows, err := q.db.Query(ctx, getAllMovieRatings)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllMovieRatingsRow
+	for rows.Next() {
+		var i GetAllMovieRatingsRow
+		if err := rows.Scan(
+			&i.MovieID,
+			&i.Title,
+			&i.RatingID,
+			&i.RatingValue,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAllMoviesWithRatings = `-- name: GetAllMoviesWithRatings :many
+SELECT
+    m.movie_id, m.title, m.budget, m.homepage, m.overview, m.popularity, m.release_date, m.revenue, m.runtime, m.movie_status, m.tagline, m.vote_average, m.vote_count,
+    r.rating_value as rating
+FROM
+    movie m
+    RIGHT JOIN movie_rating mr ON m.movie_id = mr.movie_id
+    LEFT JOIN rating r ON mr.rating_id = r.id
+ORDER BY m.movie_id, r.created_at DESC
+LIMIT 1000
+`
+
+type GetAllMoviesWithRatingsRow struct {
+	MovieID     pgtype.Int4    `json:"movie_id"`
+	Title       pgtype.Text    `json:"title"`
+	Budget      pgtype.Int4    `json:"budget"`
+	Homepage    pgtype.Text    `json:"homepage"`
+	Overview    pgtype.Text    `json:"overview"`
+	Popularity  pgtype.Numeric `json:"popularity"`
+	ReleaseDate pgtype.Date    `json:"release_date"`
+	Revenue     pgtype.Int8    `json:"revenue"`
+	Runtime     pgtype.Int4    `json:"runtime"`
+	MovieStatus pgtype.Text    `json:"movie_status"`
+	Tagline     pgtype.Text    `json:"tagline"`
+	VoteAverage pgtype.Numeric `json:"vote_average"`
+	VoteCount   pgtype.Int4    `json:"vote_count"`
+	Rating      pgtype.Numeric `json:"rating"`
+}
+
+// Get all movies with their ratings
+func (q *Queries) GetAllMoviesWithRatings(ctx context.Context) ([]GetAllMoviesWithRatingsRow, error) {
+	rows, err := q.db.Query(ctx, getAllMoviesWithRatings)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllMoviesWithRatingsRow
+	for rows.Next() {
+		var i GetAllMoviesWithRatingsRow
+		if err := rows.Scan(
+			&i.MovieID,
+			&i.Title,
+			&i.Budget,
+			&i.Homepage,
+			&i.Overview,
+			&i.Popularity,
+			&i.ReleaseDate,
+			&i.Revenue,
+			&i.Runtime,
+			&i.MovieStatus,
+			&i.Tagline,
+			&i.VoteAverage,
+			&i.VoteCount,
+			&i.Rating,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAllRatings = `-- name: GetAllRatings :many
+SELECT
+    id,
+    rating_value,
+    created_at
+FROM rating
+ORDER BY created_at DESC
+`
+
+// Get all ratings
+func (q *Queries) GetAllRatings(ctx context.Context) ([]Rating, error) {
+	rows, err := q.db.Query(ctx, getAllRatings)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Rating
+	for rows.Next() {
+		var i Rating
+		if err := rows.Scan(&i.ID, &i.RatingValue, &i.CreatedAt); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMovieAverageRating = `-- name: GetMovieAverageRating :one
+SELECT
+    m.movie_id,
+    m.title,
+    COUNT(r.id) as rating_count,
+    ROUND(AVG(r.rating_value), 2) as avg_user_rating,
+    m.vote_average as tmdb_rating
+FROM
+    movie m
+    LEFT JOIN movie_rating mr ON m.movie_id = mr.movie_id
+    LEFT JOIN rating r ON mr.rating_id = r.id
+WHERE
+    m.movie_id = $1
+GROUP BY
+    m.movie_id,
+    m.title,
+    m.vote_average
+`
+
+type GetMovieAverageRatingRow struct {
+	MovieID       int32          `json:"movie_id"`
+	Title         pgtype.Text    `json:"title"`
+	RatingCount   int64          `json:"rating_count"`
+	AvgUserRating float64        `json:"avg_user_rating"`
+	TmdbRating    pgtype.Numeric `json:"tmdb_rating"`
+}
+
+// Get average rating for a specific movie from user ratings
+func (q *Queries) GetMovieAverageRating(ctx context.Context, movieID int32) (GetMovieAverageRatingRow, error) {
+	row := q.db.QueryRow(ctx, getMovieAverageRating, movieID)
+	var i GetMovieAverageRatingRow
+	err := row.Scan(
+		&i.MovieID,
+		&i.Title,
+		&i.RatingCount,
+		&i.AvgUserRating,
+		&i.TmdbRating,
+	)
+	return i, err
+}
+
+const getMovieRatings = `-- name: GetMovieRatings :many
+SELECT r.id, r.rating_value, r.created_at
+FROM rating r
+    JOIN movie_rating mr ON r.id = mr.rating_id
+WHERE
+    mr.movie_id = $1
+ORDER BY r.created_at DESC
+`
+
+// Get all ratings for a specific movie
+func (q *Queries) GetMovieRatings(ctx context.Context, movieID int32) ([]Rating, error) {
+	rows, err := q.db.Query(ctx, getMovieRatings, movieID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Rating
+	for rows.Next() {
+		var i Rating
+		if err := rows.Scan(&i.ID, &i.RatingValue, &i.CreatedAt); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const insertMovieRating = `-- name: InsertMovieRating :one
+WITH
+    new_rating AS (
+        INSERT INTO
+            rating (rating_value)
+        VALUES ($1)
+        RETURNING
+            id,
+            rating_value,
+            created_at
+    )
+INSERT INTO
+    movie_rating (movie_id, rating_id)
+SELECT $2, id
+FROM new_rating
+RETURNING
+    rating_id
+`
+
+type InsertMovieRatingParams struct {
+	RatingValue float64 `json:"rating_value"`
+	MovieID     int32   `json:"movie_id"`
+}
+
+// Insert a rating and link it to a movie, returning the rating ID
+func (q *Queries) InsertMovieRating(ctx context.Context, arg InsertMovieRatingParams) (int32, error) {
+	row := q.db.QueryRow(ctx, insertMovieRating, arg.RatingValue, arg.MovieID)
+	var rating_id int32
+	err := row.Scan(&rating_id)
+	return rating_id, err
+}
+
+const insertRating = `-- name: InsertRating :one
+INSERT INTO
+    rating (rating_value)
+VALUES ($1)
+RETURNING
+    id,
+    rating_value,
+    created_at
+`
+
+// Insert a new rating and return the rating ID
+func (q *Queries) InsertRating(ctx context.Context, ratingValue float64) (Rating, error) {
+	row := q.db.QueryRow(ctx, insertRating, ratingValue)
+	var i Rating
+	err := row.Scan(&i.ID, &i.RatingValue, &i.CreatedAt)
+	return i, err
+}
+
 const keywordTrends = `-- name: KeywordTrends :many
 SELECT
     k.keyword_name,
     COUNT(m.movie_id) as movies_count,
     ROUND(AVG(m.vote_average), 2) as avg_rating,
     ROUND(AVG(m.revenue), 0) as avg_revenue
-FROM keyword k
+FROM
+    keyword k
     JOIN movie_keywords mk ON k.keyword_id = mk.keyword_id
     JOIN movie m ON mk.movie_id = m.movie_id
 WHERE
@@ -364,7 +661,8 @@ SELECT
     ROUND(AVG(m.vote_average), 2) as avg_rating,
     ROUND(AVG(m.revenue), 0) as avg_revenue,
     ROUND(AVG(m.popularity), 2) as avg_popularity
-FROM language l
+FROM
+    language l
     JOIN movie_languages ml ON l.language_id = ml.language_id
     JOIN movie m ON ml.movie_id = m.movie_id
 WHERE
@@ -401,6 +699,75 @@ func (q *Queries) LanguagePopularity(ctx context.Context) ([]LanguagePopularityR
 			&i.AvgRating,
 			&i.AvgRevenue,
 			&i.AvgPopularity,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const linkMovieRating = `-- name: LinkMovieRating :exec
+INSERT INTO movie_rating (movie_id, rating_id) VALUES ($1, $2)
+`
+
+type LinkMovieRatingParams struct {
+	MovieID  int32 `json:"movie_id"`
+	RatingID int32 `json:"rating_id"`
+}
+
+// Link an existing movie with an existing rating
+func (q *Queries) LinkMovieRating(ctx context.Context, arg LinkMovieRatingParams) error {
+	_, err := q.db.Exec(ctx, linkMovieRating, arg.MovieID, arg.RatingID)
+	return err
+}
+
+const listMovies = `-- name: ListMovies :many
+SELECT
+    m.movie_id,
+    m.title,
+    m.release_date,
+    m.popularity,
+    m.vote_average
+FROM
+    movie m
+ORDER BY
+    m.popularity DESC,
+    m.release_date DESC
+LIMIT $1 OFFSET $2
+`
+
+type ListMoviesParams struct {
+	Limit  int64 `json:"limit"`
+	Offset int64 `json:"offset"`
+}
+
+type ListMoviesRow struct {
+	MovieID     int32          `json:"movie_id"`
+	Title       pgtype.Text    `json:"title"`
+	ReleaseDate pgtype.Date    `json:"release_date"`
+	Popularity  pgtype.Numeric `json:"popularity"`
+	VoteAverage pgtype.Numeric `json:"vote_average"`
+}
+
+func (q *Queries) ListMovies(ctx context.Context, arg ListMoviesParams) ([]ListMoviesRow, error) {
+	rows, err := q.db.Query(ctx, listMovies, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListMoviesRow
+	for rows.Next() {
+		var i ListMoviesRow
+		if err := rows.Scan(
+			&i.MovieID,
+			&i.Title,
+			&i.ReleaseDate,
+			&i.Popularity,
+			&i.VoteAverage,
 		); err != nil {
 			return nil, err
 		}
@@ -538,7 +905,8 @@ SELECT
     ROUND(AVG(m.revenue), 0) as avg_revenue,
     ROUND(AVG(m.vote_average), 2) as avg_rating,
     SUM(m.revenue) as total_revenue
-FROM production_company pc
+FROM
+    production_company pc
     JOIN movie_company mcom ON pc.company_id = mcom.company_id
     JOIN movie m ON mcom.movie_id = m.movie_id
 WHERE
@@ -589,7 +957,10 @@ func (q *Queries) StudioPerformance(ctx context.Context) ([]StudioPerformanceRow
 
 const yearlyTrends = `-- name: YearlyTrends :many
 SELECT
-    EXTRACT(YEAR FROM release_date)::int AS year,
+    EXTRACT(
+        YEAR
+        FROM release_date
+    )::int AS year,
     COUNT(*) AS movies_count,
     ROUND(AVG(budget), 0) AS avg_budget,
     ROUND(AVG(revenue), 0) AS avg_revenue,
@@ -598,9 +969,15 @@ SELECT
 FROM movie
 WHERE
     release_date IS NOT NULL
-    AND EXTRACT(YEAR FROM release_date) < 2017
+    AND EXTRACT(
+        YEAR
+        FROM release_date
+    ) < 2017
 GROUP BY
-    EXTRACT(YEAR FROM release_date)
+    EXTRACT(
+        YEAR
+        FROM release_date
+    )
 ORDER BY year
 `
 

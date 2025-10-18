@@ -97,6 +97,11 @@ type MovieLanguage struct {
 	LanguageRoleID pgtype.Int4 `json:"language_role_id"`
 }
 
+type MovieRating struct {
+	MovieID  int32 `json:"movie_id"`
+	RatingID int32 `json:"rating_id"`
+}
+
 type Person struct {
 	PersonID   int32       `json:"person_id"`
 	PersonName pgtype.Text `json:"person_name"`
@@ -110,4 +115,10 @@ type ProductionCompany struct {
 type ProductionCountry struct {
 	MovieID   pgtype.Int4 `json:"movie_id"`
 	CountryID pgtype.Int4 `json:"country_id"`
+}
+
+type Rating struct {
+	ID          int32            `json:"id"`
+	RatingValue float64          `json:"rating_value"`
+	CreatedAt   pgtype.Timestamp `json:"created_at"`
 }

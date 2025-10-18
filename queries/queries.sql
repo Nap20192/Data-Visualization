@@ -27,7 +27,8 @@ SELECT
     ROUND(AVG(m.vote_average), 2) as avg_rating,
     ROUND(AVG(m.popularity), 2) as avg_popularity,
     ROUND(AVG(m.revenue), 0) as avg_revenue
-FROM genre g
+FROM
+    genre g
     JOIN movie_genres mg ON g.genre_id = mg.genre_id
     JOIN movie m ON mg.movie_id = m.movie_id
 WHERE
@@ -52,7 +53,6 @@ SELECT
     ROUND(AVG(vote_average), 2) as avg_rating,
     ROUND(AVG(runtime), 0) as avg_runtime
 FROM movie
-
 WHERE
     release_date IS NOT NULL
     AND EXTRACT(
@@ -71,7 +71,10 @@ ORDER BY decade;
 -- name: YearlyTrends :many
 -- Number of movies and average metrics by year
 SELECT
-    EXTRACT(YEAR FROM release_date)::int AS year,
+    EXTRACT(
+        YEAR
+        FROM release_date
+    )::int AS year,
     COUNT(*) AS movies_count,
     ROUND(AVG(budget), 0) AS avg_budget,
     ROUND(AVG(revenue), 0) AS avg_revenue,
@@ -80,11 +83,16 @@ SELECT
 FROM movie
 WHERE
     release_date IS NOT NULL
-    AND EXTRACT(YEAR FROM release_date) < 2017
+    AND EXTRACT(
+        YEAR
+        FROM release_date
+    ) < 2017
 GROUP BY
-    EXTRACT(YEAR FROM release_date)
+    EXTRACT(
+        YEAR
+        FROM release_date
+    )
 ORDER BY year;
-
 
 -- name: ActorRoleCounts :many
 -- Actors with highest number of roles and average rating of their movies
@@ -93,7 +101,8 @@ SELECT
     COUNT(mc.movie_id) as roles_count,
     ROUND(AVG(m.vote_average), 2) as avg_movie_rating,
     ROUND(AVG(m.popularity), 2) as avg_movie_popularity
-FROM person p
+FROM
+    person p
     JOIN movie_cast mc ON p.person_id = mc.person_id
     JOIN movie m ON mc.movie_id = m.movie_id
 WHERE
@@ -114,7 +123,8 @@ SELECT
     ROUND(AVG(m.revenue), 0) as avg_revenue,
     ROUND(AVG(m.vote_average), 2) as avg_rating,
     SUM(m.revenue) as total_revenue
-FROM production_company pc
+FROM
+    production_company pc
     JOIN movie_company mcom ON pc.company_id = mcom.company_id
     JOIN movie m ON mcom.movie_id = m.movie_id
 WHERE
@@ -135,7 +145,8 @@ SELECT
     ROUND(AVG(m.budget), 0) as avg_budget,
     ROUND(AVG(m.revenue), 0) as avg_revenue,
     ROUND(AVG(m.vote_average), 2) as avg_rating
-FROM country c
+FROM
+    country c
     JOIN production_country pc ON c.country_id = pc.country_id
     JOIN movie m ON pc.movie_id = m.movie_id
 WHERE
@@ -182,7 +193,8 @@ SELECT
     ROUND(AVG(m.vote_average), 2) as avg_rating,
     ROUND(AVG(m.revenue), 0) as avg_revenue,
     ROUND(AVG(m.popularity), 2) as avg_popularity
-FROM language l
+FROM
+    language l
     JOIN movie_languages ml ON l.language_id = ml.language_id
     JOIN movie m ON ml.movie_id = m.movie_id
 WHERE
@@ -201,7 +213,8 @@ SELECT
     COUNT(m.movie_id) as movies_count,
     ROUND(AVG(m.vote_average), 2) as avg_rating,
     ROUND(AVG(m.revenue), 0) as avg_revenue
-FROM keyword k
+FROM
+    keyword k
     JOIN movie_keywords mk ON k.keyword_id = mk.keyword_id
     JOIN movie m ON mk.movie_id = m.movie_id
 WHERE
@@ -223,7 +236,8 @@ SELECT
     ROUND(AVG(m.revenue), 0) as avg_revenue,
     ROUND(AVG(m.budget), 0) as avg_budget,
     SUM(m.revenue) as total_box_office
-FROM person p
+FROM
+    person p
     JOIN movie_crew mc ON p.person_id = mc.person_id
     JOIN movie m ON mc.movie_id = m.movie_id
     JOIN department d ON mc.department_id = d.department_id
@@ -239,3 +253,119 @@ HAVING
     COUNT(m.movie_id) >= 3
 ORDER BY avg_rating DESC, total_box_office DESC
 LIMIT 15;
+
+-- name: InsertRating :one
+-- Insert a new rating and return the rating ID
+INSERT INTO
+    rating (rating_value)
+VALUES ($1)
+RETURNING
+    id,
+    rating_value,
+    created_at;
+
+-- name: LinkMovieRating :exec
+-- Link an existing movie with an existing rating
+INSERT INTO movie_rating (movie_id, rating_id) VALUES ($1, $2);
+
+-- name: InsertMovieRating :one
+-- Insert a rating and link it to a movie, returning the rating ID
+WITH
+    new_rating AS (
+        INSERT INTO
+            rating (rating_value)
+        VALUES ($1)
+        RETURNING
+            id,
+            rating_value,
+            created_at
+    )
+INSERT INTO
+    movie_rating (movie_id, rating_id)
+SELECT $2, id
+FROM new_rating
+RETURNING
+    rating_id;
+
+-- name: GetMovieRatings :many
+-- Get all ratings for a specific movie
+SELECT r.id, r.rating_value, r.created_at
+FROM rating r
+    JOIN movie_rating mr ON r.id = mr.rating_id
+WHERE
+    mr.movie_id = $1
+ORDER BY r.created_at DESC;
+
+-- name: GetMovieAverageRating :one
+-- Get average rating for a specific movie from user ratings
+SELECT
+    m.movie_id,
+    m.title,
+    COUNT(r.id) as rating_count,
+    ROUND(AVG(r.rating_value), 2) as avg_user_rating,
+    m.vote_average as tmdb_rating
+FROM
+    movie m
+    LEFT JOIN movie_rating mr ON m.movie_id = mr.movie_id
+    LEFT JOIN rating r ON mr.rating_id = r.id
+WHERE
+    m.movie_id = $1
+GROUP BY
+    m.movie_id,
+    m.title,
+    m.vote_average;
+
+-- name: ListMovies :many
+SELECT
+    m.movie_id,
+    m.title,
+    m.release_date,
+    m.popularity,
+    m.vote_average
+FROM
+    movie m
+ORDER BY
+    m.popularity DESC,
+    m.release_date DESC
+LIMIT $1 OFFSET $2;
+
+-- name: GetAllRatings :many
+-- Get all ratings
+SELECT
+    id,
+    rating_value,
+    created_at
+FROM rating
+ORDER BY created_at DESC;
+
+-- name: GetAllMovieRatings :many
+-- Get all movie ratings with movie and rating details
+SELECT
+    mr.movie_id,
+    m.title,
+    mr.rating_id,
+    r.rating_value,
+    r.created_at
+FROM movie_rating mr
+    JOIN movie m ON mr.movie_id = m.movie_id
+    JOIN rating r ON mr.rating_id = r.id
+ORDER BY r.created_at DESC;
+
+-- name: GetAllMovieRatingTable :many
+-- Get all rows from movie_rating junction table
+SELECT
+    movie_id,
+    rating_id
+FROM movie_rating
+ORDER BY movie_id, rating_id;
+
+-- name: GetAllMoviesWithRatings :many
+-- Get all movies with their ratings
+SELECT
+    m.*,
+    r.rating_value as rating
+FROM
+    movie m
+    RIGHT JOIN movie_rating mr ON m.movie_id = mr.movie_id
+    LEFT JOIN rating r ON mr.rating_id = r.id
+ORDER BY m.movie_id, r.created_at DESC;
