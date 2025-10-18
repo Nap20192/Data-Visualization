@@ -1,0 +1,158 @@
+table_name: genre
+main_dttm_col: release_date
+description: null
+default_endpoint: null
+offset: 0
+cache_timeout: null
+catalog: movies
+schema: null
+sql: "SELECT\n    g.genre_name,\n    m.title,\n    m.budget,\n    m.revenue,\n   \
+  \ (m.revenue - m.budget) AS profit,\n    ROUND((m.revenue::numeric / NULLIF(m.budget,\
+  \ 0) - 1) * 100, 2) AS roi_percent,\n    m.popularity,\n    m.vote_average,\n  \
+  \  m.release_date\nFROM movie AS m\nLEFT JOIN movie_genres AS mg ON mg.movie_id\
+  \ = m.movie_id\nLEFT JOIN genre AS g ON g.genre_id = mg.genre_id\nWHERE m.budget\
+  \ > 0 AND m.revenue > 0;\n"
+params: null
+template_params: null
+filter_select_enabled: true
+fetch_values_predicate: null
+extra: null
+normalize_columns: false
+always_filter_main_dttm: false
+uuid: db1c627b-7b77-4fb8-83ae-315fa2cb38d0
+metrics:
+- metric_name: count
+  verbose_name: COUNT(*)
+  metric_type: count
+  expression: COUNT(*)
+  description: null
+  d3format: null
+  currency: null
+  extra:
+    warning_markdown: ''
+  warning_text: null
+columns:
+- column_name: roi
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: null
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: "CASE\n    WHEN roi_percent >= 100 THEN 'High ROI'\n    WHEN roi_percent\
+    \ >= 30 AND roi_percent < 100 THEN 'Medium ROI'\n    WHEN roi_percent >= 0 AND\
+    \ roi_percent < 30 THEN 'Low ROI'\n    ELSE 'Negative ROI'\nEND\n"
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: vote_average
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: DECIMAL
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: roi_percent
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: DECIMAL
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: popularity
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: DECIMAL
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: release_date
+  verbose_name: null
+  is_dttm: true
+  is_active: true
+  type: DATE
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: revenue
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: LONGINTEGER
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: profit
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: LONGINTEGER
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: budget
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: INTEGER
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: genre_name
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: title
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: STRING
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+version: 1.0.0
+database_uuid: ccd1f858-a922-49df-97db-7da3e776acbe

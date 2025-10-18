@@ -1,0 +1,53 @@
+slice_name: Genere Profit
+description: null
+certified_by: null
+certification_details: null
+viz_type: pie
+params:
+  datasource: 33__table
+  viz_type: pie
+  slice_id: 267
+  groupby:
+  - genre_name
+  metric:
+    expressionType: SQL
+    sqlExpression: SUM(profit)
+    column: null
+    aggregate: null
+    datasourceWarning: false
+    hasCustomLabel: true
+    label: Total Profit
+    optionName: metric_79h8u7yeijp_lquhnock23h
+  adhoc_filters:
+  - clause: WHERE
+    comparator: No filter
+    expressionType: SIMPLE
+    operator: TEMPORAL_RANGE
+    subject: release_date
+  row_limit: 500
+  sort_by_metric: true
+  color_scheme: supersetColors
+  show_labels_threshold: 5
+  roseType: null
+  show_legend: true
+  legendType: scroll
+  legendOrientation: top
+  label_type: key
+  number_format: $,.2f
+  date_format: smart_date
+  show_labels: true
+  labels_outside: true
+  outerRadius: 72
+  extra_form_data: {}
+  dashboards:
+  - 13
+query_context: '{"datasource":{"id":33,"type":"table"},"force":false,"queries":[{"filters":[{"col":"release_date","op":"TEMPORAL_RANGE","val":"No
+  filter"}],"extras":{"having":"","where":""},"applied_time_extras":{},"columns":["genre_name"],"metrics":[{"expressionType":"SQL","sqlExpression":"SUM(profit)","column":null,"aggregate":null,"datasourceWarning":false,"hasCustomLabel":true,"label":"Total
+  Profit","optionName":"metric_79h8u7yeijp_lquhnock23h"}],"orderby":[[{"expressionType":"SQL","sqlExpression":"SUM(profit)","column":null,"aggregate":null,"datasourceWarning":false,"hasCustomLabel":true,"label":"Total
+  Profit","optionName":"metric_79h8u7yeijp_lquhnock23h"},false]],"annotation_layers":[],"row_limit":500,"series_limit":0,"order_desc":true,"url_params":{},"custom_params":{},"custom_form_data":{}}],"form_data":{"datasource":"33__table","viz_type":"pie","slice_id":267,"groupby":["genre_name"],"metric":{"expressionType":"SQL","sqlExpression":"SUM(profit)","column":null,"aggregate":null,"datasourceWarning":false,"hasCustomLabel":true,"label":"Total
+  Profit","optionName":"metric_79h8u7yeijp_lquhnock23h"},"adhoc_filters":[{"clause":"WHERE","comparator":"No
+  filter","expressionType":"SIMPLE","operator":"TEMPORAL_RANGE","subject":"release_date"}],"row_limit":500,"sort_by_metric":true,"color_scheme":"supersetColors","show_labels_threshold":5,"roseType":null,"show_legend":true,"legendType":"scroll","legendOrientation":"top","label_type":"key","number_format":"$,.2f","date_format":"smart_date","show_labels":true,"labels_outside":true,"outerRadius":72,"extra_form_data":{},"dashboards":[13],"force":false,"result_format":"json","result_type":"full"},"result_format":"json","result_type":"full"}'
+cache_timeout: null
+uuid: c8d71d12-6620-4afd-8c79-d53282608e17
+version: 1.0.0
+dataset_uuid: db1c627b-7b77-4fb8-83ae-315fa2cb38d0

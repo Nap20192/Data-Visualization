@@ -1,0 +1,618 @@
+dashboard_title: profit analytic
+description: null
+css: ''
+slug: null
+certified_by: ''
+certification_details: ''
+published: true
+uuid: 4f5f92c7-86d1-40eb-bf2f-d2896dcf3934
+position:
+  CHART-explore-267-1:
+    children: []
+    id: CHART-explore-267-1
+    meta:
+      chartId: 267
+      height: 50
+      sliceName: Genere Profit
+      uuid: c8d71d12-6620-4afd-8c79-d53282608e17
+      width: 4
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-javo-5sZrLEDATjikXePn
+    type: CHART
+  CHART-explore-268-1:
+    children: []
+    id: CHART-explore-268-1
+    meta:
+      chartId: 268
+      height: 50
+      sliceName: Actors by profit
+      uuid: 7551177d-83eb-4736-bc1d-8f09b35dc6e8
+      width: 6
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-pACaZ9kl5GBY_Ihy_IzT5
+    type: CHART
+  CHART-explore-269-1:
+    children: []
+    id: CHART-explore-269-1
+    meta:
+      chartId: 269
+      height: 50
+      sliceName: ROI Budget
+      uuid: 24f52eb9-ecab-4145-98cb-d11909d28e0f
+      width: 6
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-pACaZ9kl5GBY_Ihy_IzT5
+    type: CHART
+  CHART-explore-309-1:
+    children: []
+    id: CHART-explore-309-1
+    meta:
+      chartId: 309
+      height: 50
+      sliceName: world distribution profit by movies
+      uuid: dd7a9b36-d4c4-4b9b-a6e8-cfe070820afa
+      width: 8
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-javo-5sZrLEDATjikXePn
+    type: CHART
+  CHART-explore-310-1:
+    children: []
+    id: CHART-explore-310-1
+    meta:
+      chartId: 310
+      height: 50
+      sliceName: profit budget
+      uuid: 45a95ab7-1327-47c1-9c19-ff761de04b81
+      width: 12
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-SS3_Xrb7heJgLgj3nSfNj
+    type: CHART
+  DASHBOARD_VERSION_KEY: v2
+  GRID_ID:
+    children:
+    - ROW-javo-5sZrLEDATjikXePn
+    - ROW-pACaZ9kl5GBY_Ihy_IzT5
+    - ROW-SS3_Xrb7heJgLgj3nSfNj
+    id: GRID_ID
+    parents:
+    - ROOT_ID
+    type: GRID
+  HEADER_ID:
+    id: HEADER_ID
+    meta:
+      text: profit analytic
+    type: HEADER
+  ROOT_ID:
+    children:
+    - GRID_ID
+    id: ROOT_ID
+    type: ROOT
+  ROW-SS3_Xrb7heJgLgj3nSfNj:
+    children:
+    - CHART-explore-310-1
+    id: ROW-SS3_Xrb7heJgLgj3nSfNj
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    type: ROW
+  ROW-javo-5sZrLEDATjikXePn:
+    children:
+    - CHART-explore-309-1
+    - CHART-explore-267-1
+    id: ROW-javo-5sZrLEDATjikXePn
+    meta:
+      '0': ROOT_ID
+      background: BACKGROUND_TRANSPARENT
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    type: ROW
+  ROW-pACaZ9kl5GBY_Ihy_IzT5:
+    children:
+    - CHART-explore-268-1
+    - CHART-explore-269-1
+    id: ROW-pACaZ9kl5GBY_Ihy_IzT5
+    meta:
+      '0': ROOT_ID
+      background: BACKGROUND_TRANSPARENT
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    type: ROW
+metadata:
+  chart_configuration:
+    '267':
+      id: 267
+      crossFilters:
+        scope: global
+        chartsInScope:
+        - 268
+        - 269
+        - 309
+        - 310
+    '309':
+      id: 309
+      crossFilters:
+        scope: global
+        chartsInScope:
+        - 267
+        - 268
+        - 269
+        - 310
+    '310':
+      id: 310
+      crossFilters:
+        scope: global
+        chartsInScope:
+        - 267
+        - 268
+        - 269
+        - 309
+  global_chart_configuration:
+    scope:
+      rootPath:
+      - ROOT_ID
+      excluded: []
+    chartsInScope:
+    - 267
+    - 268
+    - 269
+    - 309
+    - 310
+  map_label_colors:
+    Adventure: '#1FA8C9'
+    Action: '#454E7C'
+    Comedy: '#5AC189'
+    Drama: '#FF7F44'
+    Thriller: '#666666'
+    Family: '#E04355'
+    Fantasy: '#FCC700'
+    Science Fiction: '#A868B7'
+    Animation: '#3CCCCB'
+    Romance: '#A38F79'
+    Crime: '#8FD3E4'
+    Mystery: '#A1A6BD'
+    Horror: '#ACE1C4'
+    War: '#FEC0A1'
+    Music: '#B2B2B2'
+    History: '#EFA1AA'
+    Western: '#FDE380'
+    Documentary: '#D3B3DA'
+    <NULL>: '#9EE5E5'
+    Foreign: '#D1C6BC'
+    United States of America: '#1FA8C9'
+    United Kingdom: '#454E7C'
+    Germany: '#5AC189'
+    Canada: '#FF7F44'
+    France: '#666666'
+    New Zealand: '#E04355'
+    China: '#FCC700'
+    Australia: '#A868B7'
+    Japan: '#3CCCCB'
+    Czech Republic: '#A38F79'
+    Italy: '#8FD3E4'
+    Hong Kong: '#A1A6BD'
+    India: '#ACE1C4'
+    Malta: '#FEC0A1'
+    Spain: '#B2B2B2'
+    Taiwan: '#EFA1AA'
+    Bahamas: '#FDE380'
+    United Arab Emirates: '#D3B3DA'
+    Jamaica: '#9EE5E5'
+    Dominica: '#D1C6BC'
+    Mexico: '#454E7C'
+    Ireland: '#5AC189'
+    Iceland: '#FF7F44'
+    Finland: '#666666'
+    Sweden: '#E04355'
+    Poland: '#FCC700'
+    Hungary: '#A868B7'
+    Belgium: '#3CCCCB'
+    Russia: '#A38F79'
+    South Africa: '#8FD3E4'
+    Slovenia: '#A1A6BD'
+    Romania: '#ACE1C4'
+    Norway: '#FEC0A1'
+    Pakistan: '#B2B2B2'
+    Philippines: '#EFA1AA'
+    Bulgaria: '#FDE380'
+    Peru: '#D3B3DA'
+    Brazil: '#9EE5E5'
+    Netherlands: '#D1C6BC'
+    Morocco: '#D1C6BC'
+    Austria: '#454E7C'
+    Argentina: '#5AC189'
+    South Korea: '#FF7F44'
+    Singapore: '#666666'
+    Thailand: '#E04355'
+    Portugal: '#FCC700'
+    Greece: '#A868B7'
+    Israel: '#3CCCCB'
+    Kazakhstan: '#A38F79'
+    Luxembourg: '#8FD3E4'
+    Serbia: '#A1A6BD'
+    Indonesia: '#ACE1C4'
+    Chile: '#FEC0A1'
+    Iran: '#B2B2B2'
+    Angola: '#EFA1AA'
+    Denmark: '#FDE380'
+    Serbia and Montenegro: '#D3B3DA'
+    Fiji: '#9EE5E5'
+    Lithuania: '#9EE5E5'
+    Tunisia: '#D1C6BC'
+    Switzerland: '#454E7C'
+    Hugo Weaving: '#1FA8C9'
+    Liam Neeson: '#454E7C'
+    Harrison Ford: '#5AC189'
+    Julie Walters: '#FF7F44'
+    Jan Rabson: '#666666'
+    Anthony Daniels: '#E04355'
+    Alfred Molina: '#FCC700'
+    Michael Blain-Rozgay: '#A868B7'
+    Joseph Brady Madden: '#3CCCCB'
+    James Remar: '#A38F79'
+    Andrew Stanton: '#8FD3E4'
+    Martin Hub: '#A1A6BD'
+    Daniel Westwood: '#ACE1C4'
+    Jon Voight: '#FEC0A1'
+    Rami Malek: '#B2B2B2'
+    Barry Humphries: '#EFA1AA'
+    Bernard Fox: '#FDE380'
+    Simon Crane: '#D3B3DA'
+    Gerald R. Molen: '#9EE5E5'
+    Gloria Stuart: '#D1C6BC'
+    Gregory Charles Kosty: '#454E7C'
+    Fannie Brett: '#5AC189'
+    George Kosty Jr.: '#FF7F44'
+    Bret Aaron Knower: '#666666'
+    Tara Strong: '#E04355'
+    Benicio del Toro: '#FCC700'
+    Yvonne Angulo: '#A868B7'
+    Bruce Bundy: '#3CCCCB'
+    Rashmi Rustagi: '#A38F79'
+    Tiffany Salerno: '#8FD3E4'
+    Amra Mallassi: '#A1A6BD'
+    Caleb Pieplow: '#ACE1C4'
+    Paul Jude Letersky: '#FEC0A1'
+    Robert Duvall: '#B2B2B2'
+    Michael Wildman: '#EFA1AA'
+    Courtney Peldon: '#FDE380'
+    Carter Sand: '#D3B3DA'
+    Musca Kumalo: '#9EE5E5'
+    Barry Pepper: '#D1C6BC'
+    Demetrois Hodges: '#D1C6BC'
+    John Carroll Lynch: '#454E7C'
+    Robert Curtis Brown: '#5AC189'
+    Tony Cox: '#FF7F44'
+    Claudia Kim: '#666666'
+    Aurelia Riley: '#E04355'
+    Philip J Silvera: '#FCC700'
+    Walton Goggins: '#A868B7'
+    Evan Peters: '#3CCCCB'
+    Will Yun Lee: '#A38F79'
+    Clive Ashborn: '#8FD3E4'
+    Brian Smyj: '#A1A6BD'
+    Amanda Plummer: '#ACE1C4'
+    Katherine Ringgold: '#FEC0A1'
+    Lea Thompson: '#B2B2B2'
+    Tim Robbins: '#EFA1AA'
+    Diane Kruger: '#FDE380'
+    Kyle Patrick Brennan: '#D3B3DA'
+    James Logan: '#9EE5E5'
+    Bill Maher: '#9EE5E5'
+    Isabel Lucas: '#D1C6BC'
+    Kiersten Warren: '#454E7C'
+    Tara Reid: '#5AC189'
+    Mark Roman: '#FF7F44'
+    Bill Cowher: '#666666'
+    Stanley Sellers: '#E04355'
+    George Kelly: '#FCC700'
+    Scott Churchson: '#A868B7'
+    Franco Nero: '#3CCCCB'
+    Ashlie Atkinson: '#A38F79'
+    Courteney Cox: '#8FD3E4'
+    Candice Orwell: '#A1A6BD'
+    Chris Coppola: '#ACE1C4'
+    Billy Wagenseller: '#FEC0A1'
+    Cainan Wiebe: '#B2B2B2'
+    Karol Cristina da Silva: '#EFA1AA'
+    Joe Nunez: '#FDE380'
+    Rob Huebel: '#D3B3DA'
+    Peter O'Farrell: '#D3B3DA'
+    Grant Heslov: '#9EE5E5'
+    Alexis Knapp: '#D1C6BC'
+    Jason Weaver: '#454E7C'
+    Kornelia Horvath: '#5AC189'
+    Conrad Coates: '#FF7F44'
+    Don Harvey: '#666666'
+    Ewen Bremner: '#E04355'
+    Dominic Applewhite: '#FCC700'
+    Helene Wilson: '#A868B7'
+    Tom Sylla: '#3CCCCB'
+    Jimi Mistry: '#A38F79'
+    Jaimie Alexander: '#8FD3E4'
+    Jeremy Davies: '#A1A6BD'
+    Olumiji Olawumi: '#ACE1C4'
+    Wayne Wilderson: '#FEC0A1'
+    Rebecca Ferguson: '#B2B2B2'
+    Michael Ealy: '#EFA1AA'
+    Jonathan Taylor Thomas: '#FDE380'
+    Geoffrey Thomas: '#FDE380'
+    Ripley Sobo: '#D3B3DA'
+    Patrick Swayze: '#9EE5E5'
+    Mark Matheisen: '#D1C6BC'
+    Kelly Butler: '#454E7C'
+    Ryan Irving: '#5AC189'
+    Joe Grisaffi: '#FF7F44'
+    Naomi Scott: '#666666'
+    Josh Lucas: '#E04355'
+    Ben Cooke: '#FCC700'
+    Dalyn Chew: '#A868B7'
+    Alen Toric: '#3CCCCB'
+    Tim Ajro: '#A38F79'
+    David Kilde: '#8FD3E4'
+    Anthony Brandon Wong: '#A1A6BD'
+    Tamina Pollack-Paris: '#ACE1C4'
+    Rachel Nichols: '#FEC0A1'
+    Helena Barrett: '#B2B2B2'
+    Mike Cottrell: '#EFA1AA'
+    Matthew Cornwell: '#EFA1AA'
+    Marjorie Eaton: '#FDE380'
+    Silq Webster: '#D3B3DA'
+    Jordan Alexander Hauser: '#9EE5E5'
+    Juan Pablo Di Pace: '#D1C6BC'
+    Julie Jei: '#454E7C'
+    Rachel Skarsten: '#5AC189'
+    Teddy Coluca: '#FF7F44'
+    Alethea McGrath: '#666666'
+    Bernie Zilinskas: '#E04355'
+    Bobby Bell: '#FCC700'
+    Michael A. Thompson: '#A868B7'
+    Neil Rayment: '#3CCCCB'
+    David Shih: '#A38F79'
+    Steven Boyle: '#8FD3E4'
+    Tanya Bond: '#A1A6BD'
+    Andrea Refuto: '#ACE1C4'
+    Ron Livingston: '#FEC0A1'
+    Chris Parsons: '#B2B2B2'
+    Andy Romano: '#B2B2B2'
+    Brian Turk: '#EFA1AA'
+    James Ryan: '#FDE380'
+    Andrew Astor: '#D3B3DA'
+    Udo Kier: '#9EE5E5'
+    William Hainsworth: '#D1C6BC'
+    Patrick Poletti: '#454E7C'
+    Kevin Connolly: '#5AC189'
+    George Maguire: '#FF7F44'
+    Will Hare: '#666666'
+    Antje Traue: '#E04355'
+    Fan Bingbing: '#FCC700'
+    Cole Konis: '#A868B7'
+    Thomas Fisher: '#3CCCCB'
+    Heajee Kim: '#A38F79'
+    Garrett Palmer: '#8FD3E4'
+    Said Amel: '#A1A6BD'
+    Julian Arahanga: '#ACE1C4'
+    David Silverman: '#FEC0A1'
+    John Hans Tester: '#FEC0A1'
+    Paul Scheer: '#B2B2B2'
+    Paul J. Dove: '#EFA1AA'
+    Howard C. Hickman: '#FDE380'
+    Chekesha Van Putten: '#D3B3DA'
+    Patty Cornell: '#9EE5E5'
+    Julie Benz: '#D1C6BC'
+    Romo Gorrara: '#454E7C'
+    Simone Kessell: '#5AC189'
+    Tony Genaro: '#FF7F44'
+    Jude Beny: '#666666'
+    Bess Meisler: '#E04355'
+    Dave Lapommeray: '#FCC700'
+    Aya Cash: '#A868B7'
+    Otakuye Conroy: '#3CCCCB'
+    Gregory Itzin: '#A38F79'
+    Douglas Keever: '#8FD3E4'
+    Bokeem Woodbine: '#A1A6BD'
+    Stephanie March: '#ACE1C4'
+    Hugh Skinner: '#ACE1C4'
+    Beth Goddard: '#FEC0A1'
+    Lily Winn: '#B2B2B2'
+    Warren Scherer: '#EFA1AA'
+    Harry Davenport: '#FDE380'
+    Luke Sunshine: '#D3B3DA'
+    Richard Allan Jones: '#9EE5E5'
+    Dennis Anderson: '#D1C6BC'
+    Lucy Liemann: '#454E7C'
+    Ishaq Bux: '#5AC189'
+    Clark Gable: '#FF7F44'
+    Dax Griffin: '#666666'
+    Daryl Hannah: '#E04355'
+    Wendle Josepher: '#FCC700'
+    Daniel Roebuck: '#A868B7'
+    Yancey Arias: '#3CCCCB'
+    Miguel Nino: '#A38F79'
+    F. Driver: '#8FD3E4'
+    Luke Hanson: '#A1A6BD'
+    Gregory Tyree Boyce: '#A1A6BD'
+    Jeffrey Ashkin: '#ACE1C4'
+    Stephen Boss: '#FEC0A1'
+    Pamela Hayden: '#B2B2B2'
+    Tom Arnold: '#EFA1AA'
+    Angela Meryl: '#FDE380'
+    David Doty: '#D3B3DA'
+    David Kross: '#9EE5E5'
+    Sky Soleil: '#D1C6BC'
+    Lexie Roth: '#454E7C'
+    Rosalind Chao: '#5AC189'
+    Rim Turkhi: '#FF7F44'
+    Tyler Mane: '#666666'
+    Carlos Carrasco: '#E04355'
+    Joelle Tang: '#FCC700'
+    Reg Rogers: '#A868B7'
+    Ed Metzger: '#3CCCCB'
+    Omar Williams: '#A38F79'
+    Ali Saam: '#8FD3E4'
+    Tim Booth: '#8FD3E4'
+    Phillip Wynne: '#A1A6BD'
+    Pete Rock: '#ACE1C4'
+    Brick Sullivan: '#FEC0A1'
+    Thomas Lawinky: '#B2B2B2'
+    Sarah Reagin: '#EFA1AA'
+    Conan Lee: '#FDE380'
+    Wrong: '#D3B3DA'
+    Ken McNeill: '#9EE5E5'
+    Joe Dante: '#D1C6BC'
+    Mink Stole: '#454E7C'
+    Brian Warf: '#5AC189'
+    Li Lei: '#FF7F44'
+    Julie Van: '#666666'
+    Village: '#E04355'
+    Game: '#FCC700'
+    Lilia Skala: '#A868B7'
+    Ba Te: '#3CCCCB'
+    Jody Hill: '#A38F79'
+    Nilsa Castro: '#A38F79'
+    Peter Bull: '#8FD3E4'
+    Teo Ciltia: '#A1A6BD'
+    Joe Miller: '#ACE1C4'
+    Ren Mori: '#FEC0A1'
+    J Barton: '#B2B2B2'
+    Donna Reed: '#EFA1AA'
+    Cher: '#FDE380'
+    Tenille Houston: '#D3B3DA'
+    Lj Klink: '#9EE5E5'
+    David Allen Brooks: '#A868B7'
+    Nicholas Sadler: '#3CCCCB'
+    Martin Kove: '#5AC189'
+    Dempsey Pappion: '#FF7F44'
+    Michael Bird: '#666666'
+    Charles Durning: '#E04355'
+    Price Carson: '#FCC700'
+    Paul Freeman: '#454E7C'
+    Chris Bauer: '#A38F79'
+    Amber Valletta: '#8FD3E4'
+    Yan Dron: '#9EE5E5'
+    Chip Lane: '#A1A6BD'
+    Tracy Dali: '#ACE1C4'
+    Jaime Gomez: '#FEC0A1'
+    Marc Warren: '#B2B2B2'
+    Zach Mills: '#EFA1AA'
+    Nick Court: '#FDE380'
+    Nancy Ticotin: '#D3B3DA'
+    Brian Sacca: '#9EE5E5'
+    John Hammil: '#D1C6BC'
+    Aaron Zell: '#454E7C'
+    Dean Redman: '#5AC189'
+    KaiCarra: '#FF7F44'
+    Mirio Guidelli: '#666666'
+    Chuck Morrell: '#E04355'
+    Kevin Breslin: '#FCC700'
+    Andrew Faulds: '#A868B7'
+    Matthew Moy: '#3CCCCB'
+    Tiny Ross: '#A38F79'
+    James Denton: '#A38F79'
+    Wale Ojo: '#454E7C'
+    Beth Shields: '#A1A6BD'
+    Lou Vitale: '#ACE1C4'
+    Ben Best: '#5AC189'
+    Lee Brock: '#B2B2B2'
+    J.R. Nutt: '#EFA1AA'
+    Trent McMullen: '#666666'
+    Paul Stanley: '#A868B7'
+    Hichem Rostom: '#454E7C'
+    Connor Paolo: '#FF7F44'
+    Jim Grimshaw: '#E04355'
+    Philip Tan: '#3CCCCB'
+    Liam Dunn: '#ACE1C4'
+    Brandon Beach: '#D3B3DA'
+    Marcus Hester: '#FCC700'
+    Peter Sherayko: '#A868B7'
+    Tom Choi: '#3CCCCB'
+    Kentaro: '#A38F79'
+    Grace Chin: '#454E7C'
+    Jeff Clark: '#E04355'
+    Carl Alacchi: '#FF7F44'
+    Ted Manson: '#ACE1C4'
+    Daniela Dib: '#FEC0A1'
+    Dunia Saldu00edvar: '#454E7C'
+    Ave Ninchi: '#E04355'
+    Roberto Valentini: '#A868B7'
+    Kate Clarke: '#A38F79'
+    Kip Waldo: '#FEC0A1'
+    Lola Deem: '#666666'
+    Garret Dillahunt: '#A1A6BD'
+    Michael Horton: '#A38F79'
+    Tony Beard: '#B2B2B2'
+    Jaz Sinclair: '#454E7C'
+    Adrian Hough: '#666666'
+    Bill Gardiner: '#E04355'
+    Janessa Crimi: '#FCC700'
+    Curtis Hanson: '#A868B7'
+    Lewis Teague: '#A38F79'
+    Pik-Sen Lim: '#FEC0A1'
+    Jo Yang: '#B2B2B2'
+    Holly Boyd: '#FDE380'
+    Darrell Davis: '#9EE5E5'
+    Jill St. John: '#FEC0A1'
+    Kevin Thigpen: '#5AC189'
+    Mitsou Gu00e9linas: '#A868B7'
+    Dana Ashbrook: '#8FD3E4'
+    Kristina Lewis: '#D3B3DA'
+    Tracy Weisert: '#454E7C'
+    Mike Wilson: '#E04355'
+    Marty Fresca: '#FCC700'
+    Staci B. Flood: '#666666'
+    Ed Vasgersian: '#E04355'
+    Will Sampson: '#FCC700'
+    LaChanze: '#A868B7'
+    James Cotner: '#FEC0A1'
+    Gene Richards: '#A38F79'
+    Tim Fields: '#8FD3E4'
+    Michael H. Cole: '#E04355'
+    J.B. Rogers: '#FCC700'
+    Joe Devlin: '#3CCCCB'
+    Tracey Ellis: '#FDE380'
+    William Arnold: '#D1C6BC'
+    Riel Paley: '#A868B7'
+    Noah Keen: '#5AC189'
+    David Abeles: '#8FD3E4'
+    Bert Freed: '#FEC0A1'
+    Jacki Hill: '#FDE380'
+    Anne Bellamy: '#D3B3DA'
+    Claire Hackett: '#3CCCCB'
+    Brett Cramp: '#666666'
+    Keith Pearson: '#FCC700'
+    Ann Dominic: '#A868B7'
+    Ola Sturik: '#3CCCCB'
+    Julia West: '#8FD3E4'
+    John Fortune: '#FEC0A1'
+    Tom Larson: '#A868B7'
+    Austin Willis: '#E04355'
+    Alicia Hunt: '#A868B7'
+    Sallie Hedrick: '#9EE5E5'
+    Bobbie Elzey: '#5AC189'
+    Dylan Postl: '#666666'
+    Adi Zulkadry: '#A868B7'
+    Jena Sims: '#A38F79'
+  color_scheme: ''
+  refresh_frequency: 0
+  color_scheme_domain: []
+  expanded_slices: {}
+  label_colors: {}
+  shared_label_colors:
+  - <NULL>
+  timed_refresh_immune_slices: []
+  cross_filters_enabled: true
+  default_filters: '{}'
+version: 1.0.0
