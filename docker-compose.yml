@@ -54,9 +54,12 @@ services:
     image: prom/node-exporter:latest
     container_name: node_exporter
     command:
-      - '--path.procfs=/host/proc'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+      
+    - '--path.procfs=/host/proc'
+    - '--path.sysfs=/host/sys'
+    - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    - '--collector.hwmon'
+
     ports:
       - "9100:9100"
     volumes:

@@ -36,11 +36,25 @@ func main() {
 	defer postgres.Close()
 
 
-	// Start Binance exporter for multiple cryptocurrency pairs
-	symbols := []string{"BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "XRPUSDT"}
-	binanceExporter := internal.NewBinanceExporter(symbols)
+	symbols := []string{
+	"BTCUSDT",
+	"ETHUSDT",
+	"BNBUSDT",
+	"SOLUSDT",
+	"XRPUSDT",
+	"ADAUSDT",
+	"AVAXUSDT",
+	"DOGEUSDT",
+	"TONUSDT",
+	"LINKUSDT",
+	"MATICUSDT",
+	"DOTUSDT",
+	"TRXUSDT",
+	"LTCUSDT",
+	"APTUSDT",
+	}
 
-	// Start Prometheus HTTP server
+	binanceExporter := internal.NewBinanceExporter(symbols)
 	http.Handle("/metrics", promhttp.Handler())
 	server := &http.Server{Addr: ":8000"}
 
@@ -59,7 +73,6 @@ func main() {
 	<-ctx.Done()
 	slog.Info("shutting down")
 
-	// Graceful shutdown
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := server.Shutdown(shutdownCtx); err != nil {

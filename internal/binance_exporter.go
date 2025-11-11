@@ -32,6 +32,7 @@ type BinanceExporter struct {
 	openPriceGauge       *prometheus.GaugeVec
 	lastUpdateGauge      *prometheus.GaugeVec
 	weightedAvgGauge     *prometheus.GaugeVec
+	upGauge              *prometheus.GaugeVec
 
 	symbols    []string
 	httpClient *http.Client
@@ -71,6 +72,7 @@ func NewBinanceExporter(symbols []string) *BinanceExporter {
 		httpClient: &http.Client{Timeout: 10 * time.Second},
 		data:       make(map[string]*TickerData),
 		lastTrades: make(map[string]int64),
+
 		priceGauge: promauto.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Name: "binance_price",
@@ -169,6 +171,13 @@ func NewBinanceExporter(symbols []string) *BinanceExporter {
 			},
 			[]string{"symbol"},
 		),
+		upGauge: promauto.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "binance_up",
+				Help: "1 if the exporter is successfully scraping data, 0 otherwise",
+			},
+			[]string{"symbol"},
+		),
 	}
 }
 
@@ -230,6 +239,7 @@ func (e *BinanceExporter) fetchSymbolData(ctx context.Context, symbol string) {
 		slog.Error("Failed to create request",
 			slog.String("symbol", symbol),
 			slog.String("error", err.Error()))
+		e.upGauge.WithLabelValues(symbol).Set(0)
 		return
 	}
 	req.Header.Set("User-Agent", "dv-binance-exporter/1.0")
@@ -239,6 +249,7 @@ func (e *BinanceExporter) fetchSymbolData(ctx context.Context, symbol string) {
 		slog.Error("Failed to fetch data from Binance API",
 			slog.String("symbol", symbol),
 			slog.String("error", err.Error()))
+		e.upGauge.WithLabelValues(symbol).Set(0)
 		return
 	}
 	defer resp.Body.Close()
@@ -247,6 +258,7 @@ func (e *BinanceExporter) fetchSymbolData(ctx context.Context, symbol string) {
 		slog.Error("Binance API returned error",
 			slog.String("symbol", symbol),
 			slog.Int("status", resp.StatusCode))
+		e.upGauge.WithLabelValues(symbol).Set(0)
 		return
 	}
 
@@ -255,12 +267,15 @@ func (e *BinanceExporter) fetchSymbolData(ctx context.Context, symbol string) {
 		slog.Error("Failed to parse JSON response",
 			slog.String("symbol", symbol),
 			slog.String("error", err.Error()))
+		e.upGauge.WithLabelValues(symbol).Set(0)
 		return
 	}
 
 	e.mu.Lock()
 	e.data[symbol] = &ticker
 	e.mu.Unlock()
+
+	e.upGauge.WithLabelValues(symbol).Set(1)
 
 	slog.Debug("Fetched data from Binance API",
 		slog.String("symbol", symbol),
