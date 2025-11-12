@@ -5,6 +5,7 @@ mesh = o3d.io.read_triangle_mesh("model.ply")
 mesh.compute_vertex_normals()
 
 print("=== Шаг 1: Исходная модель ===")
+
 print("Количество вершин:", np.asarray(mesh.vertices).shape[0])
 print("Количество треугольников:", np.asarray(mesh.triangles).shape[0])
 print("Наличие цвета:", mesh.has_vertex_colors())
@@ -12,77 +13,112 @@ print("Наличие нормалей:", mesh.has_vertex_normals())
 
 o3d.visualization.draw_geometries([mesh], window_name="Исходная модель")
 
-pcd = mesh.sample_points_uniformly(number_of_points=5000)
 
-print("\n=== Шаг 2: Облако точек ===")
-print("Количество вершин (точек):", np.asarray(pcd.points).shape[0])
-print("Наличие цвета:", pcd.has_colors())
 
-o3d.visualization.draw_geometries([pcd], window_name="Облако точек")
+point_cloud = o3d.io.read_point_cloud("model.ply")
+o3d.visualization.draw_geometries([point_cloud], window_name="Облако точек из модели")
 
-mesh_poisson, _ = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(pcd, depth=8)
-bbox = mesh.get_axis_aligned_bounding_box()
-mesh_poisson = mesh_poisson.crop(bbox)
+print("=== Шаг 2: Облако точек из модели ===")
+print("Количество точек:", np.asarray(point_cloud.points).shape[0])
+print("Наличие цвета:", point_cloud.has_colors())
 
-print("\n=== Шаг 3: Реконструированный mesh ===")
-print("Количество вершин:", np.asarray(mesh_poisson.vertices).shape[0])
-print("Количество треугольников:", np.asarray(mesh_poisson.triangles).shape[0])
-print("Наличие цвета:", mesh_poisson.has_vertex_colors())
+mesh_from_pc = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(point_cloud, depth=9)[0]
+mesh_from_pc.crop(point_cloud.get_axis_aligned_bounding_box())
+o3d.visualization.draw_geometries([mesh_from_pc], window_name="Модель из облака точек")
 
-o3d.visualization.draw_geometries([mesh_poisson], window_name="Реконструкция Poisson")
+print("=== Шаг 3: Модель из облака точек ===")
+print("Количество вершин:", np.asarray(mesh_from_pc.vertices).shape[0])
+print("Количество треугольников:", np.asarray(mesh_from_pc.triangles).shape[0])
+print("Наличие цвета:", mesh_from_pc.has_vertex_colors())
 
-voxel_size = 0.1
-voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(pcd, voxel_size=voxel_size)
-
-print("\n=== Шаг 4: Вокселизация ===")
-print("Количество вершин (центров вокселей):", len(voxel_grid.get_voxels()))
+voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(point_cloud, voxel_size=0.05)
+o3d.visualization.draw_geometries([voxel_grid], window_name="Воксельная сетка из облака точек")
+print("=== Шаг 4: Воксельная сетка из облака точек ===")
+print("Количество вокселей:", len(voxel_grid.get_voxels()))
 print("Наличие цвета:", voxel_grid.has_colors())
 
-o3d.visualization.draw_geometries([voxel_grid], window_name="Воксели")
+bbox = mesh.get_axis_aligned_bounding_box()
+min_bound = bbox.min_bound
+max_bound = bbox.max_bound
+center = bbox.get_center()
+size = max_bound - min_bound
 
-plane = o3d.geometry.TriangleMesh.create_box(width=1.0, height=0.01, depth=1.0)
+plane_margin = 0.2
+plane_width = size[0] + plane_margin
+plane_depth = size[2] + plane_margin
+plane_height = 0.01
+
+plane = o3d.geometry.TriangleMesh.create_box(width=plane_width,
+                                             height=plane_height,
+                                             depth=plane_depth)
 plane.paint_uniform_color([0.8, 0.1, 0.1])
-plane.translate(mesh.get_center() + np.array([0, -0.5, 0]))
 
-print("\n=== Шаг 5: Плоскость ===")
-o3d.visualization.draw_geometries([mesh, plane], window_name="Объект + плоскость")
+plane.translate([center[0] - plane_width/2,
+                 min_bound[1] +25,
+                 center[2] - plane_depth/2])
 
-# Простая обрезка по оси Y
-points = np.asarray(pcd.points)
-mask = points[:,1] > plane.get_center()[1]  # оставляем точки выше плоскости
-pcd_clipped = o3d.geometry.PointCloud()
-pcd_clipped.points = o3d.utility.Vector3dVector(points[mask])
+# Визуализируем модель с плоскостью
+o3d.visualization.draw_geometries([mesh, plane], window_name="Модель с пересекающей плоскостью")
 
-print("\n=== Шаг 6: Обрезка ===")
-print("Количество оставшихся точек:", np.asarray(pcd_clipped.points).shape[0])
-print("Наличие цвета:", pcd_clipped.has_colors())
-print("Наличие нормалей:", pcd_clipped.has_normals())
 
-o3d.visualization.draw_geometries([pcd_clipped, plane], window_name="Обрезка по плоскости")
+print("=== Шаг 5: Модель с пересекающей плоскостью ===")
+# Используем центр плоскости для клиппинга
+plane_center = np.asarray(plane.get_center())
+plane_normal = np.array([0, 1, 0])
+plane_point = plane_center
 
-# Убираем цвета
-pcd_clipped.colors = o3d.utility.Vector3dVector(np.zeros_like(np.asarray(pcd_clipped.points)))
+points = np.asarray(mesh.vertices)
 
-# Задаём градиент по Z
-points = np.asarray(pcd_clipped.points)
+distances = np.dot(points - plane_point, plane_normal)
+
+mask = distances < 0
+clipped_points = points[mask]
+
+clipped_pcd = o3d.geometry.PointCloud()
+
+clipped_pcd.points = o3d.utility.Vector3dVector(clipped_points)
+
+if mesh.has_vertex_colors():
+    colors = np.asarray(mesh.vertex_colors)
+    clipped_pcd.colors = o3d.utility.Vector3dVector(colors[mask])
+
+if not clipped_pcd.has_normals():
+    clipped_pcd.estimate_normals()
+
+# Визуализация
+o3d.visualization.draw_geometries([clipped_pcd, plane], window_name="После обрезки по плоскости")
+
+print("=== Шаг 6: Обрезка по плоскости ===")
+print("Количество оставшихся точек:", np.asarray(clipped_pcd.points).shape[0])
+print("Колличество оставшихся треугольников", np.asarray(clipped_pcd.triangles).shape[0])
+print("Наличие цвета:", clipped_pcd.has_colors())
+print("Наличие нормалей:", clipped_pcd.has_normals())
+
+points = np.asarray(clipped_pcd.points)
+
+# Убираем исходные цвета
+clipped_pcd.colors = o3d.utility.Vector3dVector(np.zeros_like(points))
+
+# Создаём градиент по Z
+z_min, z_max = points[:,2].min(), points[:,2].max()
 colors = np.zeros_like(points)
-colors[:, 2] = (points[:, 2] - points[:, 2].min()) / (points[:, 2].ptp())
-pcd_clipped.colors = o3d.utility.Vector3dVector(colors)
+colors[:,2] = (points[:,2] - z_min) / (z_max - z_min)
+clipped_pcd.colors = o3d.utility.Vector3dVector(colors)
 
-# Экстремальные точки по Z
+# Находим экстремальные точки
 z_min_idx = np.argmin(points[:,2])
 z_max_idx = np.argmax(points[:,2])
 extremes = [points[z_min_idx], points[z_max_idx]]
 
 spheres = []
 for pt in extremes:
-    s = o3d.geometry.TriangleMesh.create_sphere(radius=0.05)
-    s.translate(pt)
-    s.paint_uniform_color([1,0,0])
-    spheres.append(s)
+    sphere = o3d.geometry.TriangleMesh.create_sphere(radius=2)
+    sphere.translate(pt)
+    sphere.paint_uniform_color([1,0,0])
+    spheres.append(sphere)
 
-print("\n=== Шаг 7: Цвет и экстремумы ===")
+o3d.visualization.draw_geometries([clipped_pcd] + spheres, window_name="Градиент и экстремумы")
+
+print("=== Шаг 7: Градиент и экстремумы ===")
 print("Минимум Z:", extremes[0])
 print("Максимум Z:", extremes[1])
-
-o3d.visualization.draw_geometries([pcd_clipped] + spheres, window_name="Градиент и экстремумы")
